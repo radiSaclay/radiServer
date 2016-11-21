@@ -1,0 +1,15 @@
+{
+  "propel": {
+    "database": {
+      "connections": {
+        "default": {
+          "adapter": "mysql",
+          "dsn": "mysql:host=localhost;port=3306;dbname=radisaclay",
+          "user": "root",
+          "password": null,
+          "settings": { "charset": "utf8" }
+        }
+      }
+    }
+  }
+}
