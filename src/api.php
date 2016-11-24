@@ -2,16 +2,16 @@
 
 // Get query objects
 function query ($table) {
-  if ($table == 'authors') return \AuthorQuery::create();
-  if ($table == 'books') return \BookQuery::create();
-  if ($table == 'publishers') return \PublisherQuery::create();
+  if ($table == 'farms') return \FarmQuery::create();
+  if ($table == 'events') return \EventQuery::create();
+  if ($table == 'products') return \ProductQuery::create();
 }
 
 // Get instance objects
 function instanciate ($table) {
-  if ($table == 'authors') return new \Author();
-  if ($table == 'books') return new \Book();
-  if ($table == 'publishers') return new \Publisher();
+  if ($table == 'farms') return new \Farm();
+  if ($table == 'events') return new \Event();
+  if ($table == 'products') return new \Product();
 }
 
 // ==================================================

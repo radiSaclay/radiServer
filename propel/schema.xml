@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="default" defaultIdMethod="native">
+  <!-- User -->
+  <table name="user" phpName="User">
+    <behavior name="auto_add_pk"/>
+    <column name="email" type="varchar" required="true" primaryString="true"/>
+    <column name="password" type="varchar" required="true"/>
+    <behavior name="timestampable"/>
+  </table>
+
+  <!-- Farm -->
+  <table name="farm" phpName="Farm">
+    <behavior name="auto_add_pk"/>
+    <column name="owner_id" type="integer" required="true"/>
+    <foreign-key foreignTable="user">
+      <reference local="owner_id" foreign="id"/>
+    </foreign-key>
+    <column name="name" type="varchar" required="true" primaryString="true"/>
+    <column name="address" type="longvarchar" required="true"/>
+    <column name="web_site" type="varchar"/>
+    <column name="phone" type="varchar"/>
+    <column name="email" type="varchar"/>
+    <behavior name="timestampable"/>
+  </table>
+
+  <!-- Product -->
+  <table name="product" phpName="Product">
+    <behavior name="auto_add_pk"/>
+    <column name="parent_id" type="integer"/>
+    <foreign-key foreignTable="product">
+      <reference local="parent_id" foreign="id"/>
+    </foreign-key>
+    <column name="name" type="varchar" required="true" primaryString="true"/>
+    <behavior name="timestampable" />
+  </table>
+
+  <!-- Event -->
+  <table name="event" phpName="Event">
+    <behavior name="auto_add_pk"/>
+    <column name="farm_id" type="integer"/>
+    <column name="product_id" type="integer"/>
+    <foreign-key foreignTable="product">
+      <reference local="product_id" foreign="id"/>
+    </foreign-key>
+    <foreign-key foreignTable="farm">
+      <reference local="farm_id" foreign="id"/>
+    </foreign-key>
+    <column name="description" type="longvarchar" required="true"/>
+    <column name="publish_at" type="timestamp"/>
+    <column name="begin_at" type="timestamp"/>
+    <column name="end_at" type="timestamp"/>
+    <behavior name="timestampable" />
+  </table>
+
+  <!-- Relations -->
+
+  <!-- Order (User - Product - Farm) -->
+  <table name="order" phpName="Order">
+    <behavior name="auto_add_pk"/>
+    <column name="user_id" type="integer" required="true"/>
+    <foreign-key foreignTable="user">
+      <reference local="user_id" foreign="id"/>
+    </foreign-key>
+    <column name="farm_id" type="integer" required="true"/>
+    <foreign-key foreignTable="farm">
+      <reference local="farm_id" foreign="id"/>
+    </foreign-key>
+    <column name="product_id" type="integer" required="true"/>
+    <foreign-key foreignTable="product">
+      <reference local="product_id" foreign="id"/>
+    </foreign-key>
+    <column name="quantity" type="decimal" required="true"/>
+    <column name="collected_at" type="timestamp"/>
+    <column name="delivered_at" type="timestamp"/>
+  </table>
+
+  <!-- Farm - Event -->
+  <table name="farm_product" isCrossRef="true">
+    <column name="farm_id" type="integer" primaryKey="true"/>
+    <column name="product_id" type="integer" primaryKey="true"/>
+    <foreign-key foreignTable="product">
+      <reference local="product_id" foreign="id"/>
+    </foreign-key>
+    <foreign-key foreignTable="farm">
+      <reference local="farm_id" foreign="id"/>
+    </foreign-key>
+  </table>
+
+  <!-- User - Event -->
+  <table name="pin" isCrossRef="true">
+    <column name="event_id" type="integer" primaryKey="true"/>
+    <column name="user_id" type="integer" primaryKey="true"/>
+    <foreign-key foreignTable="user">
+      <reference local="user_id" foreign="id"/>
+    </foreign-key>
+    <foreign-key foreignTable="event">
+      <reference local="event_id" foreign="id"/>
+    </foreign-key>
+  </table>
+
+  <!-- User - Farm/Product -->
+  <table name="subscription" phpName="Subscription">
+    <behavior name="auto_add_pk"/>
+    <column name="user_id" type="integer" primaryKey="true"/>
+    <foreign-key foreignTable="user">
+      <reference local="user_id" foreign="id"/>
+    </foreign-key>
+    <column name="subscription_id" type="integer" primaryKey="true"/>
+    <column name="subscription_type" type="varchar" primaryKey="true"/>
+  </table>
+
+</database>

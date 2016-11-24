@@ -13,9 +13,9 @@ $app = new App();
 require_once '../src/api.php';
 
 // > API routes
-$app->any('/api/books/[{id}]', api\resource('books'));
-$app->any('/api/authors/[{id}]', api\resource('authors'));
-$app->any('/api/publishers/[{id}]', api\resource('publishers'));
+$app->any('/api/farms/[{id}]', api\resource('farms'));
+$app->any('/api/events/[{id}]', api\resource('events'));
+$app->any('/api/products/[{id}]', api\resource('products'));
 
 // > Wildcard
 $app->get('[/{params:.*}]', function ($request, $response, $args) {
