@@ -9,13 +9,28 @@ use Slim\App;
 
 $app = new App();
 
-// > API
+// > Load dependencies
+require_once '../src/auth.php';
 require_once '../src/api.php';
 
-// > API routes
+// =====================================================
+//   ROUTES
+// =====================================================
+
+// > API
+//  ~ GET    /api/XXXs/ -> list all
+//  ~ GET    /api/XXXs/:id -> get one by id
+//  ~ POST   /api/XXXs/ -> create new one
+//  ~ PUT    /api/XXXs/:id -> update by id
+//  ~ DELETE /api/XXXs/:id -> delete by id
 $app->any('/api/farms/[{id}]', api\resource('farms'));
 $app->any('/api/events/[{id}]', api\resource('events'));
 $app->any('/api/products/[{id}]', api\resource('products'));
+
+// > Users & Authentication
+$app->post('/auth/signin', function ($req, $res) { auth\signin($req, $res); });
+$app->post('/auth/login', function ($req, $res) { auth\login($req, $res); });
+$app->get('/auth/logout', function ($req, $res) { auth\logout($req, $res); });
 
 // > Wildcard
 $app->get('[/{params:.*}]', function ($request, $response, $args) {
