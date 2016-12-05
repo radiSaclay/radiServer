@@ -48,7 +48,6 @@ $app->any('/api/products/[{id}]', api\resource('products'));
 // > Users & Authentication
 $app->post('/auth/signin', function ($req, $res) { return auth\signin($req, $res); });
 $app->post('/auth/login', function ($req, $res) { return auth\login($req, $res); });
-$app->get('/auth/logout', function ($req, $res) { return auth\logout($req, $res); });
 
 // > Wildcard
 $app->get('[/{params:.*}]', function ($request, $response, $args) {
