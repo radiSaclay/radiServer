@@ -8,13 +8,16 @@ use Slim\Http\Response;
 use Slim\App;
 
 // > Env
+// Load "./.env" file as the "$_ENV" variable
 $dotenv = new Dotenv\Dotenv(realpath('..'));
 $dotenv->load();
 // ---
 
+// Create the Slim App
 $app = new App();
 
-// > Load dependencies
+// > Load "./src" modules
+// All kind of usefull functions thematically sorted
 require_once '../src/auth.php';
 require_once '../src/api.php';
 
@@ -52,4 +55,5 @@ $app->get('[/{params:.*}]', function ($request, $response, $args) {
   var_dump(explode('/', $request->getAttribute('params')));
 });
 
+// Start the Slim App
 $app->run();
