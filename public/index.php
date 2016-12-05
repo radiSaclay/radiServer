@@ -7,6 +7,11 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\App;
 
+// > Env
+$dotenv = new Dotenv\Dotenv(realpath('..'));
+$dotenv->load();
+// ---
+
 $app = new App();
 
 // > Load dependencies
