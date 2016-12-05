@@ -21,6 +21,9 @@ $app = new App();
 require_once '../src/auth.php';
 require_once '../src/api.php';
 
+// > load routes from "./routes"
+require_once '../routes/auth.php';
+
 // =====================================================
 //   ROUTES
 // =====================================================
@@ -44,10 +47,6 @@ $checkLogged = function ($req, $res, $next) {
 $app->any('/api/farms/[{id}]', api\resource('farms'))->add($checkLogged);
 $app->any('/api/events/[{id}]', api\resource('events'));
 $app->any('/api/products/[{id}]', api\resource('products'));
-
-// > Users & Authentication
-$app->post('/auth/signin', function ($req, $res) { return auth\signin($req, $res); });
-$app->post('/auth/login', function ($req, $res) { return auth\login($req, $res); });
 
 // > Wildcard
 $app->get('[/{params:.*}]', function ($request, $response, $args) {
