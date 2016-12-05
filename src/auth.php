@@ -24,7 +24,3 @@ function getUserId ($req) {
     return null;
   }
 }
-
-function getRights ($req) {
-  // Return an array of the right of the user
-}
