@@ -22,13 +22,23 @@ require_once '../src/api.php';
 //   ROUTES
 // =====================================================
 
+// > Middleware
+$checkLogged = function ($req, $res, $next) {
+  $token = \auth\getToken($req);
+  if ($token && $token["user_id"]) {
+    return $next($req, $res);
+  } else {
+    return $res->withStatus(401);
+  }
+};
+
 // > API
 //  ~ GET    /api/XXXs/ -> list all
 //  ~ GET    /api/XXXs/:id -> get one by id
 //  ~ POST   /api/XXXs/ -> create new one
 //  ~ PUT    /api/XXXs/:id -> update by id
 //  ~ DELETE /api/XXXs/:id -> delete by id
-$app->any('/api/farms/[{id}]', api\resource('farms'));
+$app->any('/api/farms/[{id}]', api\resource('farms'))->add($checkLogged);
 $app->any('/api/events/[{id}]', api\resource('events'));
 $app->any('/api/products/[{id}]', api\resource('products'));
 
