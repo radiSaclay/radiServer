@@ -1,5 +1,17 @@
 <?php namespace auth;
 
+use \Firebase\JWT\JWT;
+// $key = "example_key";
+// $token = array(
+//   "iss" => issuer
+//   "aud" => audience
+//   "iat" => issued at
+//   "nbf" => not before
+//   "exp" => expire at
+// );
+// JWT::encode( ... , $key);
+// JWT::decode( ... , $key, array('HS256'));
+
 function signin ($req, $res) {
   // Create the new user and save it
 }
