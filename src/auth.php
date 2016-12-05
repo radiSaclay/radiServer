@@ -1,25 +1,12 @@
 <?php namespace auth;
 
-use \Firebase\JWT\JWT;
-// $token = array(
-//   "iss" => issuer
-//   "aud" => audience
-//   "iat" => issued at
-//   "nbf" => not before
-//   "exp" => expire at
-// );
-// JWT::encode( ... , $jwtkey);
-// JWT::decode( ... , $jwtkey, array('HS256'));
+require_once 'jwt.php';
 
 // Create a token for a specific user
-function createToken (\User $user) {
-  $jwtkey = $_ENV['JWTKEY'];
-  $now = time();
-  return JWT::encode([
-    "iat" => $now,
-    "exp" => $now + (60 * 60 * 24 * 7), // 1 week
+function createUserToken (\User $user) {
+  return createToken([
     "user_id" => $user->getId()
-  ], $jwtkey);
+  ], 60 * 60 * 24 * 7);
 }
 
 // Create the new user and save it
@@ -31,7 +18,7 @@ function signin ($req, $res) {
     ->withStatus(200)
     ->withJson([
       "validated" => true,
-      "token" => createToken($user)
+      "token" => createUserToken($user)
     ]);
 }
 
@@ -42,7 +29,7 @@ function login ($req, $res) {
   if ($user && $user->getPassword() === $data["Password"]) {
     return $res->withJson([
       "validated" => true,
-      "token" => createToken($user)
+      "token" => createUserToken($user)
     ]);
   }
   return $res->withJson([
