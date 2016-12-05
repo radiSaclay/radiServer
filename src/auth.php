@@ -38,12 +38,25 @@ function login ($req, $res) {
   ]);
 }
 
+// Actually useles...
 function logout ($req, $res) {
   // Destroy the token
 }
 
+// Return true if the $req has a valid token
 function isLogged ($req) {
-  // Return true if the $req has a valid token
+  $token = getToken($req);
+  return ($token && $token["user_id"]);
+}
+
+// Return the user.id of the logged user or null
+function getUserId ($req) {
+  $token = getToken($req);
+  if ($token && $token["user_id"]) {
+    return $token["user_id"];
+  } else {
+    return null;
+  }
 }
 
 function getRights ($req) {

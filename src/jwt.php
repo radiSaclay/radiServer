@@ -23,13 +23,12 @@ function createToken ($body, $lifespan = 0) {
 
 function decodeToken ($jwt) {
   global $jwtkey;
-  return JWT::decode($jwt, $jwtkey, array('HS256'));
+  return (array) JWT::decode($jwt, $jwtkey, array('HS256'));
 }
 
 function getToken ($req) {
-  $data = $req->getParsedBody();
-  if (isset($data["_token"])) {
-    return decodeToken($data["_token"]);
+  if ($req->hasHeader('Authorization')) {
+    return decodeToken($req->getHeader('Authorization')[0]);
   } else {
     return null;
   }
