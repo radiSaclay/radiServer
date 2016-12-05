@@ -1,28 +1,6 @@
 <?php namespace api;
 
-// Get query objects
-function query ($table) {
-  if ($table == 'pin') return \PinQuery::create();
-  if ($table == 'user') return \UserQuery::create();
-  if ($table == 'farms') return \FarmQuery::create();
-  if ($table == 'order') return \OrderQuery::create();
-  if ($table == 'events') return \EventQuery::create();
-  if ($table == 'products') return \ProductQuery::create();
-  if ($table == 'farm-product') return \FarmProductQuery::create();
-  if ($table == 'subscription') return \SubscriptionQuery::create();
-}
-
-// Get instance objects
-function instanciate ($table) {
-  if ($table == 'pin') return new \Pin();
-  if ($table == 'user') return new \User();
-  if ($table == 'farms') return new \Farm();
-  if ($table == 'order') return new \Order();
-  if ($table == 'events') return new \Event();
-  if ($table == 'products') return new \Product();
-  if ($table == 'farm-product') return new \FarmProduct();
-  if ($table == 'subscription') return new \Subscription();
-}
+require_once 'classes.php';
 
 // ==================================================
 //  > Resource
@@ -49,18 +27,18 @@ function resource ($table) {
 }
 
 function getAll ($table) {
-  return array('status' => 200, 'data' => query($table)->find()->toArray());
+  return array('status' => 200, 'data' => \query($table)->find()->toArray());
 }
 
 function create ($table, $req) {
-  $item = instanciate($table);
+  $item = \instanciate($table);
   $item->fromArray($req->getParsedBody());
   $item->save();
   return array('status' => 200, 'data' => $item->toArray());
 }
 
 function getById ($table, $id) {
-  if ($item = query($table)->findPK($id)) {
+  if ($item = \query($table)->findPK($id)) {
     return array('status' => 200, 'data' => $item->toArray());
   } else {
     return array('status' => 404, 'data' => null);
@@ -68,7 +46,7 @@ function getById ($table, $id) {
 }
 
 function edit ($table, $id, $req) {
-  if ($item = query($table)->findPK($id)) {
+  if ($item = \query($table)->findPK($id)) {
     $item->update($req->getParsedBody());
     return array('status' => 200, 'data' => $item->toArray());
   } else {
