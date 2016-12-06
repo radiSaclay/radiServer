@@ -1,3 +1,6 @@
 vendor/
 *.lock
 .env
+propel/generated-conf/
+propel/generated-sql/
+propel/propel.json
