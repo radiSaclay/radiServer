@@ -1,4 +1,4 @@
-<?php namespace auth;
+<?php
 
 // > Middlewares
 //  - Add "->add($mwXXX)" after a route definition
@@ -13,8 +13,7 @@
 // Returns 401 status for guests.
 // ==================================================
 $mwCheckLogged = function ($req, $res, $next) {
-  $token = getToken($req);
-  if ($token && $token["user_id"]) {
+  if (auth\isLogged($req)) {
     return $next($req, $res);
   } else {
     return $res->withStatus(401);
