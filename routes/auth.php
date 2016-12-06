@@ -10,8 +10,12 @@
 // to the server under the "Authorization" header.
 // ==================================================
 $app->post('/auth/signin', function ($request, $response) {
+  // Get post's body
+  $data = $request->getParsedBody();
+  // Create a new user
   $user = new User();
-  $user->fromArray($request->getParsedBody());
+  $user->setEmail($data["Email"]);
+  $user->setPassword(password_hash($data["Password"], PASSWORD_DEFAULT));
   $user->save();
   return $response
     ->withStatus(200)
@@ -39,7 +43,7 @@ $app->post('/auth/login', function ($request, $response) {
   // Retrieve the user
   $user = UserQuery::create()->findOneByEmail($data["Email"]);
   // Check if an user have been found and if the passwords match
-  if ($user && $user->getPassword() === $data["Password"]) {
+  if ($user && password_verify($data["Password"], $user->getPassword())) {
     // Valid credentials
     return $response->withJson([
       "validated" => true,
