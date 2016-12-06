@@ -27,4 +27,3 @@ For `farms`, `products` and `events`, you have access to a complete REST CRUD AP
 #### Authentication
 - POST `auth/signin`
 - POST `auth/login`
-- GET `auth/logout`
