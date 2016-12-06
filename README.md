@@ -28,3 +28,43 @@ For `farms`, `products` and `events`, you have access to a complete REST CRUD AP
 #### Authentication
 - POST `auth/signin`
 - POST `auth/login`
+
+To log in or sign in, you must sent a post request to the proper route and a json body such as:
+```json
+{
+  "Email": "victor.hugo@paris.fr",
+  "Password": "Causette"
+}
+```
+
+You will recieve a response containing a json looking like :
+```json
+{
+  "validated": true,
+  "token": "AAA.BBB.CCC"
+}
+```
+You must resend that token with every request under the header `Authorization` so as to be recognizedd by the server.
+
+## File structure
+```
+.
+├─ ...
+├─ propel
+|   ├─ ...
+|   ├─ propel.json
+|   └─ schema.xml
+├─ public
+|   ├─ .htacess
+|   └─ index.php
+├─ routes
+|   └─ (your routes here)
+├─ src
+|   ├─ auth.php
+|   ├─ jwt.php
+|   └─ middleware.php
+├─ .env
+├─ .htaccess
+├─ .composer
+└── README.md (you are here)
+```
