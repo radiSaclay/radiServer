@@ -1,8 +1,10 @@
 <?php
 
+// Load dependecies
 require_once '../vendor/autoload.php';
 require_once '../propel/generated-conf/config.php';
 
+// Use Slim classes
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\App;
@@ -24,22 +26,13 @@ require_once '../src/middleware.php';
 
 // > load routes from "./routes"
 require_once '../routes/auth.php';
-
-// =====================================================
-//   ROUTES
-// =====================================================
-
-// > API
-//  ~ GET    /api/XXXs/ -> list all
-//  ~ GET    /api/XXXs/:id -> get one by id
-//  ~ POST   /api/XXXs/ -> create new one
-//  ~ PUT    /api/XXXs/:id -> update by id
-//  ~ DELETE /api/XXXs/:id -> delete by id
-$app->any('/api/farms/[{id}]', api\resource('farms'))->add($mwCheckLogged);
-$app->any('/api/events/[{id}]', api\resource('events'));
-$app->any('/api/products/[{id}]', api\resource('products'));
+require_once '../routes/api/farms.php';
+require_once '../routes/api/events.php';
+require_once '../routes/api/products.php';
 
 // > Wildcard
+// Will describe the path of all unregistered route.
+// For debug purpose only
 $app->get('[/{params:.*}]', function ($request, $response, $args) {
   var_dump(explode('/', $request->getAttribute('params')));
 });
