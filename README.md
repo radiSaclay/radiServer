@@ -11,7 +11,8 @@ It requires PHP 5.5+ and a database that can be configured in `./propel/propel.j
 - Clone that repository on your server
 - Install the dependencies using [composer](https://getcomposer.org/) by running `composer install` in you root directory.
 - Copy `./env.example` to `./.env` and fill it with the proper values.
-- Make sure you have created the database and properly referenced it in `./propel/propel.json` (see propel's documentation for more info.). You can migrate using propel command lines, `propel sql:build` and `propel sql:insert`. After you set the config for the database, do a `propel config:convert` to aplly the change.
+- Create a database and reference it in `./propel/propel.json` (see propel's documentation for more info.), then create the propel configuration file with `propel config:convert` in the `./propel` directory.
+- Migrate the database with propel command lines, `propel sql:build` and `propel sql:insert`.
 - Your server is now ready to go.
 
 ## Routes
