@@ -57,3 +57,20 @@ $app->post('/auth/login', function ($request, $response) {
     ]);
   }
 });
+
+// ==================================================
+// > GET /auth/user
+// --------------------------------------------------
+//   Returns all infos concerning the logged user.
+// ==================================================
+$app->get('/auth/user', function ($request, $response) {
+  // Retrieve user_id
+  $user_id = auth\getUserId($request);
+  // Look for the user
+  $user = UserQuery::create()->findPK($user_id);
+  if ($user) {
+    return $response->withJson($user->toArray());
+  } else {
+    return $response->withStatus(404);
+  }
+})->add($mwCheckLogged);
