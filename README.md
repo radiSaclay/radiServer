@@ -46,6 +46,9 @@ You will recieve a response containing a json looking like :
 ```
 You must resend that token with every request under the header `Authorization` so as to be recognizedd by the server.
 
+- GET `auth/user`
+Will send you back all info about the user corresponding to the token you have sent.
+
 ## File structure
 ```
 .
