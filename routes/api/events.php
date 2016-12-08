@@ -6,7 +6,7 @@
 $app->get('/api/events/{id}', function ($request, $response, $args) {
   $event = EventQuery::create()->findPK($args['id']);
   if ($event) {
-    return $response->withJson($event->toArray(), 201);
+    return $response->withJson($event->toArray(), 200);
   } else {
     return $response->withStatus(404);
   }
@@ -26,7 +26,7 @@ $app->get('/api/events/', function ($request, $response) {
       ->limit(25)
       ->find()
       ->toArray();
-    return $response->withJson($events, 201);
+    return $response->withJson($events, 200);
   }
 });
 
