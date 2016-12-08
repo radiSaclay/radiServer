@@ -37,5 +37,16 @@ $app->get('[/{params:.*}]', function ($request, $response, $args) {
   var_dump(explode('/', $request->getAttribute('params')));
 });
 
+// Error handler
+$container = $app->getContainer();
+$container['errorHandler'] = function ($container) {
+  return function ($request, $response, $error) use ($container) {
+    // Format of exception to return
+    return $container['response']->withJson([
+      'message' => $error->getMessage()
+    ], 500);
+  };
+};
+
 // Start the Slim App
 $app->run();
