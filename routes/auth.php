@@ -1,7 +1,7 @@
 <?php
 
 // ==================================================
-// > POST /auth/signin
+// > POST /auth/signup
 // --------------------------------------------------
 //   Excepts a json body with the attributes "Email"
 // and "Password".
@@ -9,7 +9,7 @@
 // the attribute "token", that token must be resend
 // to the server under the "Authorization" header.
 // ==================================================
-$app->post('/auth/signin', function ($request, $response) {
+$app->post('/auth/signup', function ($request, $response) {
   // Get post's body
   $data = $request->getParsedBody();
   // Create a new user

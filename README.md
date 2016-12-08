@@ -26,10 +26,10 @@ For `farms`, `products` and `events`, you have access to a complete REST CRUD AP
 - DELETE `/api/xxx/:id` to delete one item by id
 
 #### Authentication
-- POST `auth/signin`
+- POST `auth/signup`
 - POST `auth/login`
 
-To log in or sign in, you must sent a post request to the proper route and a json body such as:
+To log in or sign up, you must sent a post request to the proper route and a json body such as:
 ```json
 {
   "Email": "victor.hugo@paris.fr",
