@@ -4,7 +4,7 @@
 
 ## Installation
 #### Dependencies
-This server uses [Slim](https://www.slimframework.com) microframework (for routing, etc.) and [Propel](http://propelorm.org/) as its ORM (to interface the database).
+This server uses [Slim](https://www.slimframework.com) microframework (for routing, etc.) and [Propel](http://propelorm.org/) as its ORM (to interface the database). Authentication is done with [jwt tokens](https://github.com/firebase/php-jwt), the environement is loaded through [.env](https://github.com/vlucas/phpdotenv) file.
 It requires PHP 5.5+ and a database that can be configured in `./propel/propel.json` (see propel's documentation for more info.).
 
 #### How to install
@@ -69,5 +69,5 @@ Will send you back all info about the user corresponding to the token you have s
 ├─ .env
 ├─ .htaccess
 ├─ .composer
-└── README.md (you are here)
+└─ README.md (you are here)
 ```
