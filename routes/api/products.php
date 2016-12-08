@@ -8,21 +8,21 @@ $app->get('/api/products/{id}', function ($request, $response, $args) {
       return $response->withStatus(404);
     }
     $prods_arr = $prods_arr->toArray();
-    return $response->withJson($prods_arr, 201);
+    return $response->withJson($prods_arr, 200);
   }
 );
 
 // Returns all products
 $app->get('/api/products/', function ($request, $response) {
     $prods = ProductQuery::create()->find()->toArray();
-    return $response->withJson($prods, 201);
+    return $response->withJson($prods, 200);
   }
 );
 
 // Creates new product
 // The new product name is received in $request which should be a json file
 // having a key 'name' with value corresponding to the name of the new product
-$app->put('/api/products/', function ($request, $response) {
+$app->post('/api/products/', function ($request, $response) {
     $new_prod = new Product();
     $parsedBody = $request->getParsedBody();
     if($parsedBody['name'] === null){
@@ -30,13 +30,14 @@ $app->put('/api/products/', function ($request, $response) {
     }
     $new_prod->setName($parsedBody['name']);
     $new_prod->save();
+    return $response->withJson($new_prod->toArray(), 201); // Object created
   }
 );
 
 // Updates the product
 // The product to be updated is the one with id = id and its new name
 // is passed inside the $request json file (value of the ket 'new_name')
-$app->post('/api/products/{id}', function ($request, $response, $args) {
+$app->put('/api/products/{id}', function ($request, $response, $args) {
     $parsedBody = $request->getParsedBody();
     if(!array_key_exists('new_name', $parsedBody)){
       return $response->withStatus(400);
@@ -47,6 +48,7 @@ $app->post('/api/products/{id}', function ($request, $response, $args) {
     }
     $to_update->setName($parsedBody['new_name']);
     $to_update->save();
+    return $response->withStatus(200); // No errors // OK
   }
 );
 
@@ -57,5 +59,6 @@ $app->delete('/api/products/{id}', function ($request, $response, $args) {
       return $response->withStatus(404);
     }
     $to_delete->delete();
+    return $response->withStatus(200); // No errors // OK
   }
 );
