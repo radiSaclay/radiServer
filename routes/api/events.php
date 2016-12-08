@@ -31,9 +31,9 @@ $app->get('/api/events/', function ($request, $response) {
 });
 
 // ==================================================
-// > PUT /api/events/
+// > POST /api/events/
 // ==================================================
-$app->put('/api/events/', function ($request, $response) {
+$app->post('/api/events/', function ($request, $response) {
   $event = new Event();
   $event->fromArray($request->getParsedBody());
   try {
@@ -47,9 +47,9 @@ $app->put('/api/events/', function ($request, $response) {
 })->add($mwCheckLogged);
 
 // ==================================================
-// > POST /api/events/
+// > PUT /api/events/
 // ==================================================
-$app->post('/api/events/{id}', function ($request, $response, $args) {
+$app->put('/api/events/{id}', function ($request, $response, $args) {
   $event = EventQuery::create()->findPK($args['id']);
   if ($event) {
     try {

@@ -21,9 +21,9 @@ $app->get('/api/farms/', function ($request, $response) {
 });
 
 // ==================================================
-// > PUT /api/farms/
+// > POST /api/farms/
 // ==================================================
-$app->put('/api/farms/', function ($request, $response) {
+$app->post('/api/farms/', function ($request, $response) {
   $farm = new Farm();
   $farm->fromArray($request->getParsedBody());
   try {
@@ -37,9 +37,9 @@ $app->put('/api/farms/', function ($request, $response) {
 })->add($mwCheckLogged);
 
 // ==================================================
-// > POST /api/farms/
+// > PUT /api/farms/
 // ==================================================
-$app->post('/api/farms/{id}', function ($request, $response, $args) {
+$app->put('/api/farms/{id}', function ($request, $response, $args) {
   $farm = FarmQuery::create()->findPK($args['id']);
   if ($farm) {
     if ($farms->getOwnerId() === auth\getUserId()) {
