@@ -21,7 +21,7 @@ $app->get('/api/events/', function ($request, $response) {
     // TODO
   } else {
     // No user is logged, you should send back a generic stream
-    $events = ProductQuery::create()
+    $events = EventQuery::create()
       ->orderByCreatedAt('desc')
       ->limit(25)
       ->find()
@@ -30,11 +30,10 @@ $app->get('/api/events/', function ($request, $response) {
   }
 });
 
-
 // ==================================================
 // > PUT /api/events/
 // ==================================================
-$app->put('/api/events/', function ($request, $response, $args) {
+$app->put('/api/events/', function ($request, $response) {
   $event = new Event();
   $event->fromArray($request->getParsedBody());
   try {
@@ -47,32 +46,39 @@ $app->put('/api/events/', function ($request, $response, $args) {
   }
 })->add($mwCheckLogged);
 
-// // Updates the product
-// // The product to be updated is the one with id = primarykey and its new name
-// // is passed inside the $request json file (value of the ket 'new_name')
-// $app->post('/api/products/{primarykey}', function ($request, $response, $args) {
-//     $parsedBody = $request->getParsedBody();
-//     if(!array_key_exists('new_name', $parsedBody) || $args['primarykey'] === null){
-//       return $response->withStatus(400);
-//     }
-//     $new_prod = ProductQuery::create()->findPK($args['primarykey']);
-//     if($new_prod === null){
-//       return $response->withStatus(404);
-//     }
-//     $new_prod->setName($parsedBody['new_name']);
-//     $new_prod->save();
-//   }
-// );
-//
-// // Deletes the product with id primarykey
-// $app->delete('/api/products/{primarykey}', function ($request, $response, $args) {
-//     if($args['primarykey'] === null){
-//       return $response->withStatus(404);
-//     }
-//     $new_prod = ProductQuery::create()->findPK($args['primarykey']);
-//     if($new_prod === null){
-//       return $response->withStatus(404);
-//     }
-//     $new_prod->delete();
-//   }
-// );
+// ==================================================
+// > POST /api/events/
+// ==================================================
+$app->post('/api/events/{id}', function ($request, $response, $args) {
+  $event = EventQuery::create()->findPK($args['id']);
+  if ($event) {
+    try {
+      $event->update($request->getParsedBody());
+      return $response
+        ->withJson($event->toArray())
+        ->withStatus(200);
+    } catch (Exception $e) {
+      return $response->withStatus(400);
+    }
+  } else {
+    return $response->withStatus(404);
+  }
+})->add($mwCheckLogged);
+
+
+// ==================================================
+// > DELETE /api/events/
+// ==================================================
+$app->delete('/api/events/{id}', function ($request, $response, $args) {
+  $event = EventQuery::create()->findPK($args['id']);
+  if ($event) {
+    try {
+      $event->delete();
+      return $response->withStatus(200);
+    } catch (Exception $e) {
+      return $response->withStatus(400);
+    }
+  } else {
+    return $response->withStatus(404);
+  }
+})->add($mwCheckLogged);
