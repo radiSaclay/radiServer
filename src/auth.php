@@ -9,8 +9,10 @@ require_once 'jwt.php';
 // "user_id" and lasting one week.
 // ==================================================
 function createUserToken (\User $user) {
+  $farms = $user->getFarms();
   return createToken([
-    "user_id" => $user->getId()
+    "user_id" => $user->getId(),
+    "farm_id" => count($farms) ? $farms[0]->getId() : null
   ], 60 * 60 * 24 * 7);
 }
 
@@ -35,6 +37,16 @@ function getUserId ($request) {
   $token = getToken($request);
   if ($token && $token["user_id"]) {
     return $token["user_id"];
+  } else {
+    return null;
+  }
+}
+
+function getUser ($request) {
+  $token = getToken($request);
+  if ($token && $token["user_id"]) {
+    $user = \UserQuery::create()->findPK($token["user_id"]);
+    return $user ? $user : null;
   } else {
     return null;
   }

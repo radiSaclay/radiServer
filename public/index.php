@@ -18,6 +18,21 @@ $dotenv->load();
 // Create the Slim App
 $app = new App();
 
+// CORS
+$app->add(function($request, $response, $next) {
+  $response = $next($request, $response);
+  return $response
+    ->withHeader('Access-Control-Allow-Origin', "*")
+    ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+    ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+});
+$app->options('/{routes:.+}', function ($request, $response, $args) {
+  return $response
+    ->withHeader('Access-Control-Allow-Origin', "*")
+    ->withHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Accept, Origin, Authorization')
+    ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+});
+
 // > Load "./src" modules
 // All kind of usefull functions thematically sorted
 require_once '../src/auth.php';

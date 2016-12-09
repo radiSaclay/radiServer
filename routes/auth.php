@@ -14,8 +14,8 @@ $app->post('/auth/signup', function ($request, $response) {
   $data = $request->getParsedBody();
   // Create a new user
   $user = new User();
-  $user->setEmail($data["Email"]);
-  $user->setPassword(password_hash($data["Password"], PASSWORD_DEFAULT));
+  $user->setEmail($data["email"]);
+  $user->setPassword(password_hash($data["password"], PASSWORD_DEFAULT));
   $user->save();
   return $response
     ->withStatus(200)
@@ -41,9 +41,9 @@ $app->post('/auth/login', function ($request, $response) {
   // Get post's body
   $data = $request->getParsedBody();
   // Retrieve the user
-  $user = UserQuery::create()->findOneByEmail($data["Email"]);
+  $user = UserQuery::create()->findOneByEmail($data["email"]);
   // Check if an user have been found and if the passwords match
-  if ($user && password_verify($data["Password"], $user->getPassword())) {
+  if ($user && password_verify($data["password"], $user->getPassword())) {
     // Valid credentials
     return $response->withJson([
       "validated" => true,
@@ -64,12 +64,10 @@ $app->post('/auth/login', function ($request, $response) {
 //   Returns all infos concerning the logged user.
 // ==================================================
 $app->get('/auth/user', function ($request, $response) {
-  // Retrieve user_id
-  $user_id = auth\getUserId($request);
-  // Look for the user
-  $user = UserQuery::create()->findPK($user_id);
+  // Retrieve user
+  $user = auth\getUser($request);
   if ($user) {
-    return $response->withJson($user->toArray());
+    return $response->withJson(api\serializeUser($user), 200);
   } else {
     return $response->withStatus(404);
   }

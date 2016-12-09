@@ -5,8 +5,10 @@
 // ==================================================
 $app->get('/api/events/{id}', function ($request, $response, $args) {
   $event = EventQuery::create()->findPK($args['id']);
+  $user = auth\getUser($request);
+  $user = auth\getUser($request);
   if ($event) {
-    return $response->withJson($event->toArray(), 200);
+    return $response->withJson(api\serializeEvent($event, $user), 200);
   } else {
     return $response->withStatus(404);
   }
@@ -16,18 +18,24 @@ $app->get('/api/events/{id}', function ($request, $response, $args) {
 // > GET /api/events/
 // ==================================================
 $app->get('/api/events/', function ($request, $response) {
-  if (auth\isLogged($request)) {
-    // An user is logged, you should send back a personalized stream
-    // TODO
-  } else {
-    // No user is logged, you should send back a generic stream
-    $events = EventQuery::create()
-      ->orderByCreatedAt('desc')
-      ->limit(25)
-      ->find()
-      ->toArray();
-    return $response->withJson($events, 200);
+  // if (auth\isLogged($request)) {
+  //   // An user is logged, you should send back a personalized stream
+  //   // TODO
+  // } else {
+  //   // No user is logged, you should send back a generic stream
+  //   $events = EventQuery::create()
+  //     ->orderByCreatedAt('desc')
+  //     ->limit(25)
+  //     ->find()
+  //     ->toArray();
+  //   return $response->withJson($events, 200);
+  // }
+  $data = [];
+  $user = auth\getUser($request);
+  foreach(EventQuery::create()->orderByCreatedAt('desc')->find() as $event) {
+    $data[] = api\serializeEvent($event, $user);
   }
+  return $response->withJson($data, 200);
 });
 
 // ==================================================
@@ -35,12 +43,11 @@ $app->get('/api/events/', function ($request, $response) {
 // ==================================================
 $app->post('/api/events/', function ($request, $response) {
   $event = new Event();
-  $event->fromArray($request->getParsedBody());
+  $event->setFarmId(auth\getToken($request)["farm_id"]);
   try {
+    api\unserializeEvent($event, $request->getParsedBody());
     $event->save();
-    return $response
-      ->withJson($event->toArray())
-      ->withStatus(200);
+    return $response->withJson(api\serializeEvent($event), 200);
   } catch (Exception $e) {
     return $response->withStatus(400);
   }
@@ -53,10 +60,9 @@ $app->put('/api/events/{id}', function ($request, $response, $args) {
   $event = EventQuery::create()->findPK($args['id']);
   if ($event) {
     try {
-      $event->update($request->getParsedBody());
-      return $response
-        ->withJson($event->toArray())
-        ->withStatus(200);
+      api\unserializeEvent($event, $request->getParsedBody());
+      $event->save();
+      return $response->withJson(api\serializeEvent($event), 200);
     } catch (Exception $e) {
       return $response->withStatus(400);
     }
@@ -76,6 +82,38 @@ $app->delete('/api/events/{id}', function ($request, $response, $args) {
       $event->delete();
       return $response->withStatus(200);
     } catch (Exception $e) {
+      return $response->withStatus(400);
+    }
+  } else {
+    return $response->withStatus(404);
+  }
+})->add($mwCheckLogged);
+
+$app->post('/api/events/pin/{id}', function ($request, $response, $args) {
+  $event = EventQuery::create()->findPK($args['id']);
+  $user = auth\getUser($request);
+  if ($event) {
+    if (api\hasPinned($user, $event) == false) {
+      $event->addUser($user);
+      $event->save();
+      return $response->withStatus(200);
+    } else {
+      return $response->withStatus(400);
+    }
+  } else {
+    return $response->withStatus(404);
+  }
+})->add($mwCheckLogged);
+
+$app->post('/api/events/unpin/{id}', function ($request, $response, $args) {
+  $event = EventQuery::create()->findPK($args['id']);
+  $user = auth\getUser($request);
+  if ($event) {
+    if (api\hasPinned($user, $event) == true) {
+      $event->removeUser($user);
+      $event->save();
+      return $response->withStatus(200);
+    } else {
       return $response->withStatus(400);
     }
   } else {
