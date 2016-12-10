@@ -13,10 +13,12 @@ CREATE TABLE `user`
 (
     `email` VARCHAR(255) NOT NULL,
     `password` VARCHAR(255) NOT NULL,
+    `is_admin` TINYINT(1) DEFAULT 0 NOT NULL,
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`)
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `user_u_ce4c89` (`email`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
