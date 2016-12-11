@@ -35,6 +35,7 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 
 // > Load "./src" modules
 // All kind of usefull functions thematically sorted
+require_once '../src/jwt.php';
 require_once '../src/auth.php';
 require_once '../src/api.php';
 require_once '../src/middleware.php';
@@ -43,7 +44,7 @@ require_once '../src/middleware.php';
 require_once '../routes/auth.php';
 require_once '../routes/api/farms.php';
 require_once '../routes/api/events.php';
-require_once '../routes/api/products.php';
+// require_once '../routes/api/products.php';
 
 // > Wildcard
 // Will describe the path of all unregistered route.

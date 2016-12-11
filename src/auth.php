@@ -1,53 +1,62 @@
 <?php namespace auth;
 
-require_once 'jwt.php';
-
-// ==================================================
-// > createUserToken
-// --------------------------------------------------
-//   Returns an encoded jwt string containing the
-// "user_id" and lasting one week.
-// ==================================================
-function createUserToken (\User $user) {
-  $farms = $user->getFarms();
-  return createToken([
-    "user_id" => $user->getId(),
-    "farm_id" => count($farms) ? $farms[0]->getId() : null
-  ], 60 * 60 * 24 * 7);
-}
-
-// ==================================================
-// > createUserToken
-// --------------------------------------------------
-//   Returns true if the given request contains
-// a valid token with a "user_id".
-// ==================================================
-function isLogged ($request) {
-  $token = getToken($request);
-  return ($token && $token["user_id"]);
-}
-
-// ==================================================
-// > createUserToken
-// --------------------------------------------------
-//   Returns the user.id of the logged user or null
-// if no user is logged.
-// ==================================================
-function getUserId ($request) {
-  $token = getToken($request);
-  if ($token && $token["user_id"]) {
-    return $token["user_id"];
+function getUser ($request) {
+  $token = \jwt\getToken($request);
+  if ($token && isset($token["user_id"])) {
+    $user = \UserQuery::create()->findPK($token["user_id"]);
+    return $user ? $user : null;
   } else {
     return null;
   }
 }
 
-function getUser ($request) {
-  $token = getToken($request);
-  if ($token && $token["user_id"]) {
-    $user = \UserQuery::create()->findPK($token["user_id"]);
-    return $user ? $user : null;
+function isUser ($request) {
+  return (getUser($request) != null);
+}
+
+function getUserFarm ($user) {
+  return isUserFarmer($user)
+    ? $user->getFarms()->getFirst()
+    : null;
+}
+
+function isUserFarmer ($user) {
+  return ($user && $user->countFarms() > 0);
+}
+
+function isUserAdmin ($user) {
+  return ($user && $user->getIsAdmin());
+}
+
+function getFarm ($request) {
+  $user = getUser($request);
+  return getUserFarm($user);
+}
+
+function isFarmer ($request) {
+  $user = getUser($request);
+  return isUserFarmer($user);
+}
+
+function isAdmin ($request) {
+  $user = getUser($request);
+  return isUserAdmin($user);
+}
+
+// ===
+
+function createUserToken ($user) {
+  $lifespan = 60 * 60 * 24;
+  if (isUserFarmer($user)) {
+    return \jwt\createToken([
+      "user_id" => $user->getId(),
+      "user_type" => "farmer",
+      "farm_id" => getUserFarm($user)->getId(),
+    ], $lifespan);
   } else {
-    return null;
+    return \jwt\createToken([
+      "user_id" => $user->getId(),
+      "user_type" => isUserAdmin($user) ? "admin" : "farmer",
+    ], $lifespan);
   }
 }

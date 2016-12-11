@@ -1,4 +1,4 @@
-<?php namespace auth;
+<?php namespace jwt;
 
 // > Load JWT library
 use \Firebase\JWT\JWT;
@@ -51,7 +51,12 @@ function getAuthJWT ($request) {
 // ==================================================
 function decodeToken ($jwt) {
   global $jwtkey;
-  return (array) JWT::decode($jwt, $jwtkey, array("HS256"));
+  try {
+    $token = JWT::decode($jwt, $jwtkey, array("HS256"));
+    return (array) $token;
+  } catch (Exception $e) {
+    return null;
+  }
 }
 
 // ==================================================
@@ -79,7 +84,7 @@ function getToken ($request) {
   $jwt = getAuthJWT($request);
   if ($jwt != null) {
     $token = decodeToken($jwt);
-    if (checkToken($token)) {
+    if ($token && checkToken($token)) {
       return $token;
     }
   }
