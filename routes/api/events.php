@@ -4,72 +4,59 @@
 // > GET /api/events/{id}
 // ==================================================
 $app->get('/api/events/{id}', function ($request, $response, $args) {
-  $event = EventQuery::create()->findPK($args['id']);
-  $user = auth\getUser($request);
-  $user = auth\getUser($request);
-  if ($event) {
-    return $response->withJson(api\serializeEvent($event, $user), 200);
-  } else {
-    return $response->withStatus(404);
-  }
+  return api\view($response, EventQuery::create()->findPK($args['id']));
 });
 
 // ==================================================
 // > GET /api/events/
 // ==================================================
 $app->get('/api/events/', function ($request, $response) {
-  // if (auth\isLogged($request)) {
-  //   // An user is logged, you should send back a personalized stream
-  //   // TODO
-  // } else {
-  //   // No user is logged, you should send back a generic stream
-  //   $events = EventQuery::create()
-  //     ->orderByCreatedAt('desc')
-  //     ->limit(25)
-  //     ->find()
-  //     ->toArray();
-  //   return $response->withJson($events, 200);
-  // }
-  $data = [];
-  $user = auth\getUser($request);
-  foreach(EventQuery::create()->orderByCreatedAt('desc')->find() as $event) {
-    $data[] = api\serializeEvent($event, $user);
-  }
-  return $response->withJson($data, 200);
+  $events = auth\isFarmer($request)
+    ? auth\getFarm($request)->getEvents()
+    : EventQuery::create()->find();
+  return api\mapCollection(
+    $response, $events,
+    function ($event) use ($request) {
+      $data = $event->serialize();
+      if (auth\isFarmer($request)) {
+        $data["pins"] = $event->countUsers();
+      } else if (auth\isUser($request)) {
+        $user = auth\getUser($request);
+        $data["pinned"] = $event->getUsers()->contains($user);
+      }
+      return $data;
+    }
+  );
 });
 
 // ==================================================
 // > POST /api/events/
 // ==================================================
 $app->post('/api/events/', function ($request, $response) {
-  $event = new Event();
-  $event->setFarmId(auth\getToken($request)["farm_id"]);
   try {
-    api\unserializeEvent($event, $request->getParsedBody());
-    $event->save();
-    return $response->withJson(api\serializeEvent($event), 200);
+    $event = new Event();
+    $event->setFarmId(auth\getFarm($request)->getId());
+    return api\update($request, $response, $event);
   } catch (Exception $e) {
     return $response->withStatus(400);
   }
-})->add($mwCheckLogged);
+})->add('mwIsFarmer');
 
 // ==================================================
 // > PUT /api/events/
 // ==================================================
 $app->put('/api/events/{id}', function ($request, $response, $args) {
   $event = EventQuery::create()->findPK($args['id']);
-  if ($event) {
-    try {
-      api\unserializeEvent($event, $request->getParsedBody());
-      $event->save();
-      return $response->withJson(api\serializeEvent($event), 200);
-    } catch (Exception $e) {
-      return $response->withStatus(400);
-    }
-  } else {
-    return $response->withStatus(404);
+  if ($event == null) return $response->withStatus(404);
+  if ($event->getFarmId() != auth\getFarm($request)->getId()) {
+    return $response->withStatus(401);
   }
-})->add($mwCheckLogged);
+  try {
+    return api\update($request, $response, $event);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
+  }
+})->add('mwIsFarmer');
 
 
 // ==================================================
@@ -77,46 +64,46 @@ $app->put('/api/events/{id}', function ($request, $response, $args) {
 // ==================================================
 $app->delete('/api/events/{id}', function ($request, $response, $args) {
   $event = EventQuery::create()->findPK($args['id']);
-  if ($event) {
-    try {
-      $event->delete();
-      return $response->withStatus(200);
-    } catch (Exception $e) {
-      return $response->withStatus(400);
-    }
-  } else {
-    return $response->withStatus(404);
+  if ($event == null) return $response->withStatus(404);
+  if ($event->getFarmId() != auth\getFarm($request)->getId()) {
+    return $response->withStatus(401);
   }
-})->add($mwCheckLogged);
+  try {
+    $event->delete();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
+  }
+})->add('mwIsFarmer');
 
+// ==================================================
+// > POST /api/events/pin/{id}
+// ==================================================
 $app->post('/api/events/pin/{id}', function ($request, $response, $args) {
-  $event = EventQuery::create()->findPK($args['id']);
   $user = auth\getUser($request);
-  if ($event) {
-    if (api\hasPinned($user, $event) == false) {
-      $event->addUser($user);
-      $event->save();
-      return $response->withStatus(200);
-    } else {
-      return $response->withStatus(400);
-    }
-  } else {
-    return $response->withStatus(404);
+  $event = EventQuery::create()->findPK($args['id']);
+  if ($event == null) return $response->withStatus(404);
+  try {
+    $event->addUser($user);
+    $event->save();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
   }
-})->add($mwCheckLogged);
+})->add('mwIsLogged');
 
+// ==================================================
+// > POST /api/events/unpin/{id}
+// ==================================================
 $app->post('/api/events/unpin/{id}', function ($request, $response, $args) {
-  $event = EventQuery::create()->findPK($args['id']);
   $user = auth\getUser($request);
-  if ($event) {
-    if (api\hasPinned($user, $event) == true) {
-      $event->removeUser($user);
-      $event->save();
-      return $response->withStatus(200);
-    } else {
-      return $response->withStatus(400);
-    }
-  } else {
-    return $response->withStatus(404);
+  $event = EventQuery::create()->findPK($args['id']);
+  if ($event == null) return $response->withStatus(404);
+  try {
+    $event->removeUser($user);
+    $event->save();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
   }
-})->add($mwCheckLogged);
+})->add('mwIsLogged');
