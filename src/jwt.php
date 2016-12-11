@@ -5,8 +5,7 @@ use \Firebase\JWT\JWT;
 
 // > Load the JWT key
 // "JWTKEY" from the "./.env" file
-// $jwtkey = $_ENV["JWTKEY"];
-$jwtkey = "raphanus-sativus";
+$jwtkey = $_ENV["JWTKEY"];
 
 // ==================================================
 // > createToken
