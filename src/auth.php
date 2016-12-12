@@ -46,7 +46,7 @@ function isAdmin ($request) {
 // ===
 
 function createUserToken ($user) {
-  $lifespan = 60 * 60 * 24;
+  $lifespan = CONFIG["TOKEN_LIFESPAN"];
   if (isUserFarmer($user)) {
     return \jwt\createToken([
       "user_id" => $user->getId(),
