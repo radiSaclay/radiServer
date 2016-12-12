@@ -17,37 +17,8 @@ It requires PHP 5.5+ and a database that can be configured in `./propel/propel.j
 - Your server is now ready to go.
 
 ## Routes
-#### API
-For `farms`, `products` and `events`, you have access to a complete REST CRUD API, routes are :
-- GET `/api/xxx/` to list all items
-- GET `/api/xxx/:id` to get one item by id
-- POST `/api/xxx/` to create new one
-- PUT `/api/xxx/:id` to update one item by id
-- DELETE `/api/xxx/:id` to delete one item by id
 
-#### Authentication
-- POST `auth/signup`
-- POST `auth/login`
-
-To log in or sign up, you must sent a post request to the proper route and a json body such as:
-```json
-{
-  "Email": "victor.hugo@paris.fr",
-  "Password": "Causette"
-}
-```
-
-You will recieve a response containing a json looking like :
-```json
-{
-  "validated": true,
-  "token": "AAA.BBB.CCC"
-}
-```
-You must resend that token with every request under the header `Authorization` so as to be recognizedd by the server.
-
-- GET `auth/user`
-Will send you back all info about the user corresponding to the token you have sent.
+[See docs](docs)
 
 ## File structure
 ```
@@ -63,11 +34,12 @@ Will send you back all info about the user corresponding to the token you have s
 ├─ routes
 |   └─ (your routes here)
 ├─ src
-|   ├─ config.php
+|   ├─ api.php
 |   ├─ auth.php
+|   ├─ config.php
 |   ├─ jwt.php
 |   └─ middleware.php
 ├─ .htaccess
-├─ .composer
+├─ composer.json
 └─ README.md (you are here)
 ```
