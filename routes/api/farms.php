@@ -17,7 +17,8 @@ $app->get('/api/farms/', function ($request, $response) {
     function ($farm) use ($request) {
       $data = $farm->serialize();
       if (auth\isUser($request)) {
-        $data["subscribed"] = false; // TODO: $farm->getSubscribers()->toArray();
+        $user = auth\getUser($request);
+        $data["subscribed"] = $farm->hasSubscriber($user);
       }
       return $data;
     }
@@ -70,3 +71,35 @@ $app->delete('/api/farms/{id}', function ($request, $response, $args) {
     return $response->withStatus(400);
   }
 })->add('mwIsFarmer');
+
+// ==================================================
+// > POST /api/farms/subscribe/{id}
+// ==================================================
+$app->post('/api/farms/subscribe/{id}', function ($request, $response, $args) {
+  $user = auth\getUser($request);
+  $farm = FarmQuery::create()->findPK($args['id']);
+  if ($farm == null) return $response->withStatus(404);
+  try {
+    $farm->addSubscriber($user);
+    $farm->save();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
+  }
+})->add('mwIsLogged');
+
+// ==================================================
+// > POST /api/farms/unsubscribe/{id}
+// ==================================================
+$app->post('/api/farms/unsubscribe/{id}', function ($request, $response, $args) {
+  $user = auth\getUser($request);
+  $farm = FarmQuery::create()->findPK($args['id']);
+  if ($farm == null) return $response->withStatus(404);
+  try {
+    $farm->removeSubscriber($user);
+    $farm->save();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
+  }
+})->add('mwIsLogged');

@@ -14,12 +14,42 @@ use Base\Farm as BaseFarm;
  */
 class Farm extends BaseFarm {
 
-  public function getSubscribers () {
+  // > Subscriber
+
+  public function countSubscribers () {
     return SubscriptionQuery::create()
       ->filterBySubscriptionId($this->getId())
       ->filterBySubscriptionType('farm')
-      ->find();
+      ->count();
   }
+
+  public function hasSubscriber ($user) {
+    return SubscriptionQuery::create()
+      ->filterByUserId($user->getId())
+      ->filterBySubscriptionId($this->getId())
+      ->filterBySubscriptionType('farm')
+      ->count() > 0;
+  }
+
+  public function addSubscriber ($user) {
+    if (!$this->hasSubscriber($user)) {
+      $sub = new Subscription();
+      $sub->setUserId($user->getId());
+      $sub->setSubscriptionId($this->getId());
+      $sub->setSubscriptionType('farm');
+      $sub->save();
+    }
+  }
+
+  public function removeSubscriber ($user) {
+    return SubscriptionQuery::create()
+      ->filterByUserId($user->getId())
+      ->filterBySubscriptionId($this->getId())
+      ->filterBySubscriptionType('farm')
+      ->delete();
+  }
+
+  // > CRUD API
 
   public function serialize () {
     return [
