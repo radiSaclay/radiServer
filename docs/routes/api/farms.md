@@ -14,5 +14,5 @@
 ##### POST /api/farms/{id} (for user only)
 ##### PUT /api/farms/{id} (for farmer owner only)
 ##### DELETE /api/farms/{id} (for farmer owner only)
-##### POST /api/farms/subscribe/{id}
-##### POST /api/farms/unsubscribe/{id}
+##### POST /api/farms/subscribe/{id} (for user only)
+##### POST /api/farms/unsubscribe/{id} (for user only)
