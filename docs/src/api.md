@@ -6,4 +6,4 @@ If item is null, returns `404`, if not serializes it and returns it as a json.
 The propel item must have a `serialize` function return an array.
 
 ##### (Response) <- \api\update (Request, Response, Propel item)
-Update the item through the `unserialize` function using the resquest's body and returns the item as a json through the `serialize` function.
+Update the item through the `unserialize` function using the request's body and returns the item as a json through the `serialize` function.
