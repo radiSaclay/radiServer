@@ -12,7 +12,63 @@ use Base\Farm as BaseFarm;
  * long as it does not already exist in the output directory.
  *
  */
-class Farm extends BaseFarm
-{
+class Farm extends BaseFarm {
+
+  // > Subscriber
+
+  public function countSubscribers () {
+    return SubscriptionQuery::create()
+      ->filterBySubscriptionId($this->getId())
+      ->filterBySubscriptionType('farm')
+      ->count();
+  }
+
+  public function hasSubscriber ($user) {
+    return SubscriptionQuery::create()
+      ->filterByUserId($user->getId())
+      ->filterBySubscriptionId($this->getId())
+      ->filterBySubscriptionType('farm')
+      ->count() > 0;
+  }
+
+  public function addSubscriber ($user) {
+    if (!$this->hasSubscriber($user)) {
+      $sub = new Subscription();
+      $sub->setUserId($user->getId());
+      $sub->setSubscriptionId($this->getId());
+      $sub->setSubscriptionType('farm');
+      $sub->save();
+    }
+  }
+
+  public function removeSubscriber ($user) {
+    return SubscriptionQuery::create()
+      ->filterByUserId($user->getId())
+      ->filterBySubscriptionId($this->getId())
+      ->filterBySubscriptionType('farm')
+      ->delete();
+  }
+
+  // > CRUD API
+
+  public function serialize () {
+    return [
+      "id" => $this->getId(),
+      "name" => $this->getName(),
+      "ownerId" => $this->getOwnerId(),
+      "address" => $this->getAddress(),
+      "website" => $this->getWebsite(),
+      "phone" => $this->getPhone(),
+      "email" => $this->getEmail(),
+    ];
+  }
+
+  public function unserialize ($data) {
+    if (isset($data["name"])) $this->setName($data["name"]);
+    if (isset($data["address"])) $this->setAddress($data["address"]);
+    if (isset($data["website"])) $this->setWebsite($data["website"]);
+    if (isset($data["phone"])) $this->setPhone($data["phone"]);
+    if (isset($data["phone"])) $this->setEmail($data["email"]);
+  }
 
 }

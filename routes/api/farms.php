@@ -4,61 +4,55 @@
 // > GET /api/farms/{id}
 // ==================================================
 $app->get('/api/farms/{id}', function ($request, $response, $args) {
-  $farm = FarmQuery::create()->findPK($args['id']);
-  if ($farm) {
-    return $response->withJson($farm->toArray(), 200);
-  } else {
-    return $response->withStatus(404);
-  }
+  return api\view($response, FarmQuery::create()->findPK($args['id']));
 });
 
 // ==================================================
 // > GET /api/farms/
 // ==================================================
 $app->get('/api/farms/', function ($request, $response) {
-  $farms = FarmQuery::create()->find()->toArray();
-  return $response->withJson($farms, 200);
+  $farms = FarmQuery::create()->find();
+  return api\mapCollection(
+    $response, $farms,
+    function ($farm) use ($request) {
+      $data = $farm->serialize();
+      if (auth\isUser($request)) {
+        $user = auth\getUser($request);
+        $data["subscribed"] = $farm->hasSubscriber($user);
+      }
+      return $data;
+    }
+  );
 });
 
 // ==================================================
 // > POST /api/farms/
 // ==================================================
 $app->post('/api/farms/', function ($request, $response) {
-  $farm = new Farm();
-  $farm->fromArray($request->getParsedBody());
   try {
-    $farm->save();
-    return $response
-      ->withJson($farm->toArray())
-      ->withStatus(200);
+    $farm = new Farm();
+    $farm->setOwnerId(auth\getUser($request)->getId());
+    return api\update($request, $response, $farm);
   } catch (Exception $e) {
     return $response->withStatus(400);
   }
-})->add($mwCheckLogged);
+})->add('mwIsLogged');
 
 // ==================================================
 // > PUT /api/farms/
 // ==================================================
 $app->put('/api/farms/{id}', function ($request, $response, $args) {
   $farm = FarmQuery::create()->findPK($args['id']);
-  if ($farm) {
-    if ($farms->getOwnerId() === auth\getUserId()) {
-      try {
-        $farm->update($request->getParsedBody());
-        return $response
-          ->withJson($farm->toArray())
-          ->withStatus(200);
-      } catch (Exception $e) {
-        return $response->withStatus(400);
-      }
-    } else {
-      // Not the owner of the farm
-      return $response->withStatus(401);
-    }
-  } else {
-    return $response->withStatus(404);
+  if ($farm == null) return $response->withStatus(404);
+  if ($farm->getOwnerId() != auth\getUser($request)->getId()) {
+    return $response->withStatus(401);
   }
-})->add($mwCheckLogged);
+  try {
+    return api\update($request, $response, $farm);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
+  }
+})->add('mwIsFarmer');
 
 
 // ==================================================
@@ -66,19 +60,46 @@ $app->put('/api/farms/{id}', function ($request, $response, $args) {
 // ==================================================
 $app->delete('/api/farms/{id}', function ($request, $response, $args) {
   $farm = FarmQuery::create()->findPK($args['id']);
-  if ($farm) {
-    if ($farms->getOwnerId() === auth\getUserId()) {
-      try {
-        $farm->delete();
-        return $response->withStatus(200);
-      } catch (Exception $e) {
-        return $response->withStatus(400);
-      }
-    } else {
-      // Not the owner of the farm
-      return $response->withStatus(401);
-    }
-  } else {
-    return $response->withStatus(404);
+  if ($farm == null) return $response->withStatus(404);
+  if ($farm->getOwnerId() != auth\getUser($request)->getId()) {
+    return $response->withStatus(401);
   }
-})->add($mwCheckLogged);
+  try {
+    $farm->delete();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
+  }
+})->add('mwIsFarmer');
+
+// ==================================================
+// > POST /api/farms/subscribe/{id}
+// ==================================================
+$app->post('/api/farms/subscribe/{id}', function ($request, $response, $args) {
+  $user = auth\getUser($request);
+  $farm = FarmQuery::create()->findPK($args['id']);
+  if ($farm == null) return $response->withStatus(404);
+  try {
+    $farm->addSubscriber($user);
+    $farm->save();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
+  }
+})->add('mwIsLogged');
+
+// ==================================================
+// > POST /api/farms/unsubscribe/{id}
+// ==================================================
+$app->post('/api/farms/unsubscribe/{id}', function ($request, $response, $args) {
+  $user = auth\getUser($request);
+  $farm = FarmQuery::create()->findPK($args['id']);
+  if ($farm == null) return $response->withStatus(404);
+  try {
+    $farm->removeSubscriber($user);
+    $farm->save();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
+  }
+})->add('mwIsLogged');

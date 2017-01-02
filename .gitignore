@@ -1,6 +1,7 @@
 vendor/
 *.lock
 .env
+src/config.php
 propel/generated-conf/
 propel/generated-sql/
 propel/propel.json
