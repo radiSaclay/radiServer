@@ -2,6 +2,7 @@
 
 // ==================================================
 // > GET /api/events/{id}
+// Returns the event id
 // ==================================================
 $app->get('/api/events/{id}', function ($request, $response, $args) {
   return api\view($response, EventQuery::create()->findPK($args['id']));
@@ -9,6 +10,10 @@ $app->get('/api/events/{id}', function ($request, $response, $args) {
 
 // ==================================================
 // > GET /api/events/
+// If it is a farmer requesting returns all events of its farms and add the number
+// of users who have pinned the event.
+// If it is an user return all events and a bool pinned corresponding to the user
+// having pinned or not the event
 // ==================================================
 $app->get('/api/events/', function ($request, $response) {
   $events = auth\isFarmer($request)
@@ -30,7 +35,10 @@ $app->get('/api/events/', function ($request, $response) {
 });
 
 // ==================================================
-// > POST /api/events/
+// > POST /api/events/ Create event
+// Receives an event and checks if it is from a farmer,
+// marks the farm who sent it as the owner of the event
+// and puts it in the DB
 // ==================================================
 $app->post('/api/events/', function ($request, $response) {
   try {
@@ -43,7 +51,9 @@ $app->post('/api/events/', function ($request, $response) {
 })->add('mwIsFarmer');
 
 // ==================================================
-// > PUT /api/events/
+// > PUT /api/events/ Update event
+// Receives an event and checks if it comes from a farmer
+// If event exists it updates it in DB
 // ==================================================
 $app->put('/api/events/{id}', function ($request, $response, $args) {
   $event = EventQuery::create()->findPK($args['id']);
@@ -78,6 +88,7 @@ $app->delete('/api/events/{id}', function ($request, $response, $args) {
 
 // ==================================================
 // > POST /api/events/pin/{id}
+// Adds user to event (pins it)
 // ==================================================
 $app->post('/api/events/pin/{id}', function ($request, $response, $args) {
   $user = auth\getUser($request);
