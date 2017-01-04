@@ -924,6 +924,10 @@ abstract class Farm implements ActiveRecordInterface
             throw new PropelException("You cannot save an object that has been deleted.");
         }
 
+        if ($this->alreadyInSave) {
+            return 0;
+        }
+
         if ($con === null) {
             $con = Propel::getServiceContainer()->getWriteConnection(FarmTableMap::DATABASE_NAME);
         }
@@ -2778,8 +2782,8 @@ abstract class Farm implements ActiveRecordInterface
      */
     public function removeProduct(ChildProduct $product)
     {
-        if ($this->getProducts()->contains($product)) { $farmProduct = new ChildFarmProduct();
-
+        if ($this->getProducts()->contains($product)) {
+            $farmProduct = new ChildFarmProduct();
             $farmProduct->setProduct($product);
             if ($product->isFarmsLoaded()) {
                 //remove the back reference if available

@@ -15,7 +15,7 @@ use Base\Product as BaseProduct;
 class Product extends BaseProduct
 {
   // > CRUD API
-
+  // Return Object as array
   public function serialize () {
     return [
       "id" => $this->getId(),
@@ -25,21 +25,14 @@ class Product extends BaseProduct
   }
 
   public function unserialize ($data) {
-    if (!isset($data["name"])){
-     throw new Exception("Product needs a name, specify it in the json file");
-   }
-    if(
-      ProductQuery::create()
-      ->findByName($data["name"])
-      ->count() > 0
-    ){
-      throw new Exception("There already exists a product with this name");
-    }else{
-      $this->setName($data["name"]);
-    }
+    if (isset($data["name"])) $this->setName($data["name"]);
     if (isset($data["parentId"])) $this->setParent($data["parentId"]);
   }
 
+// I do this check manually because even though the DB will reject
+// Inserts having an invalid foreign key, it will send back a generic error
+// such as: Unable to execute INSERT statement [INSERT INTO product
+// (parent_id, name, id, created_at, updated_at) VALUES (:p0, :p1, :p2, :p3, :p4)]
   public function setParent ($parentId) {
     if(ProductQuery::create()
     ->findPK($parentId)){
@@ -47,6 +40,7 @@ class Product extends BaseProduct
     }else{
       throw new Exception("Parent does not exist");
     }
+    $this->setParentId($parentId);
   }
 
 }

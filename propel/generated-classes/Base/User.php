@@ -842,6 +842,10 @@ abstract class User implements ActiveRecordInterface
             throw new PropelException("You cannot save an object that has been deleted.");
         }
 
+        if ($this->alreadyInSave) {
+            return 0;
+        }
+
         if ($con === null) {
             $con = Propel::getServiceContainer()->getWriteConnection(UserTableMap::DATABASE_NAME);
         }
@@ -2801,8 +2805,8 @@ abstract class User implements ActiveRecordInterface
      */
     public function removeEvent(ChildEvent $event)
     {
-        if ($this->getEvents()->contains($event)) { $pin = new ChildPin();
-
+        if ($this->getEvents()->contains($event)) {
+            $pin = new ChildPin();
             $pin->setEvent($event);
             if ($event->isUsersLoaded()) {
                 //remove the back reference if available

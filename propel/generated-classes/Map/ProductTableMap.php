@@ -208,6 +208,7 @@ class ProductTableMap extends TableMap
         return array(
             'auto_add_pk' => array('name' => 'id', 'autoIncrement' => 'true', 'type' => 'INTEGER', ),
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
+            'validate' => array('nameNull' => array ('column' => 'name','validator' => 'NotNull',), 'nameUnique' => array ('column' => 'name','validator' => 'Unique',), ),
         );
     } // getBehaviors()
 
