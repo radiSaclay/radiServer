@@ -5,3 +5,4 @@ src/config.php
 propel/generated-conf/
 propel/generated-sql/
 propel/propel.json
+*.DS_Store

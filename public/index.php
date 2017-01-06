@@ -39,7 +39,7 @@ require_once '../src/middleware.php';
 require_once '../routes/auth.php';
 require_once '../routes/api/farms.php';
 require_once '../routes/api/events.php';
-// require_once '../routes/api/products.php';
+require_once '../routes/api/products.php';
 
 // > Wildcard
 // Will describe the path of all unregistered route.

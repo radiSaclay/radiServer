@@ -2,6 +2,7 @@
 
 // ==================================================
 // > GET /api/farms/{id}
+// Just returns the given farm
 // ==================================================
 $app->get('/api/farms/{id}', function ($request, $response, $args) {
   return api\view($response, FarmQuery::create()->findPK($args['id']));
@@ -9,6 +10,8 @@ $app->get('/api/farms/{id}', function ($request, $response, $args) {
 
 // ==================================================
 // > GET /api/farms/
+// Returns the farms and also a flag "subscribed" when user is subscribed to a
+// farm
 // ==================================================
 $app->get('/api/farms/', function ($request, $response) {
   $farms = FarmQuery::create()->find();

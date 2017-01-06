@@ -36,6 +36,11 @@
     </foreign-key>
     <column name="name" type="varchar" required="true" primaryString="true"/>
     <behavior name="timestampable" />
+
+    <behavior name="validate">
+      <parameter name="nameNull" value="{column: name, validator: NotNull}" />
+      <parameter name="nameUnique" value="{column: name, validator: Unique}" />
+    </behavior>
   </table>
 
   <!-- Event -->
