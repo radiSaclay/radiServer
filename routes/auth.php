@@ -31,6 +31,24 @@ $app->post('/auth/signup', function ($request, $response) {
 });
 
 // ==================================================
+// > DELETE /auth/delete
+// ==================================================
+$app->delete('/auth/delete', function ($request, $response) {
+    $user = auth\getUser($request);
+    if ($user) {
+        try{
+        $user->delete();
+        return $response->withStatus(200);
+        } catch(Exception $e){
+            return $response->withJson("Exception: " . $e->getMessage(), 500);
+        }
+    } else {
+        return $response->withStatus(404);
+    }
+});
+
+
+// ==================================================
 // > GET /auth/user
 // ==================================================
 $app->get('/auth/user', function ($request, $response) {

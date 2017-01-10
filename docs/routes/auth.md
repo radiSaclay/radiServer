@@ -37,3 +37,9 @@ Will return:
   "farm": { ... }
 }
 ```
+
+##### DELETE /auth/delete
+Deletes the user who has made the request (need authorization token)
+
+Will return:
+Just response code (404 if not found, 200 if deleted)

@@ -56,7 +56,8 @@ function createUserToken ($user) {
   } else {
     return \jwt\createToken([
       "user_id" => $user->getId(),
-      "user_type" => isUserAdmin($user) ? "admin" : "farmer",
+      "user_type" => isUserAdmin($user) ? "admin" : "user",
     ], $lifespan);
   }
 }
+

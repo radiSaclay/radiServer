@@ -31,7 +31,7 @@ function createToken ($payload, $lifespan = 0) {
 // > getAuthJWT
 // --------------------------------------------------
 //   Returns the jwt string contained in the given
-// request"s header under "Authorization". Returns
+// request's header under "Authorization". Returns
 // null if there is not.
 // ==================================================
 function getAuthJWT ($request) {
