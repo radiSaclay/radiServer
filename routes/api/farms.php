@@ -20,7 +20,7 @@ $app->get('/api/farms/', function ($request, $response) {
   return api\listCollection(
     $request, $response,
     FarmQuery::create(),
-    function ($request, $item) use ($user) {
+    function ($item) use ($user) {
       if ($user) {
         return [ "subscribed" => $item->hasSubscriber($user) ];
       } else {
