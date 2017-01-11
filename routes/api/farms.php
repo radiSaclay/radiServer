@@ -15,10 +15,12 @@ $app->get('/api/farms/{id}', function ($request, $response, $args) {
 // ==================================================
 $app->get('/api/farms/', function ($request, $response) {
   $farms = api\getCollection($request, FarmQuery::create());
+  $short = $request->getParam('short') ? 0 : 1;
+  $embed = $request->getParam('embed') ? 0 : -1;
   return api\mapCollection(
     $response, $farms,
-    function ($farm) use ($request) {
-      $data = $farm->serialize();
+    function ($farm) use ($request, $short, $embed) {
+      $data = $farm->serialize($short, $embed);
       if (auth\isUser($request)) {
         $user = auth\getUser($request);
         $data["subscribed"] = $farm->hasSubscriber($user);
