@@ -22,6 +22,18 @@ function view ($response, $item) {
     : $response->withStatus(404);
 }
 
+function listCollection ($request, $response, $query, $callback) {
+  $list = getCollection($request, $query);
+  $short = $request->getParam('short') ? 0 : 1;
+  $embed = $request->getParam('embed') ? 0 : -1;
+  $data = [];
+  foreach($list as $item) $data[] = array_merge(
+    $item->serialize($short, $embed),
+    $callback($item)
+  );
+  return $response->withJson($data, 200);
+}
+
 function update ($request, $response, $item) {
   $item->unserialize($request->getParsedBody());
   if(!$item->validate()){
