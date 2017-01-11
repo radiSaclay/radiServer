@@ -14,7 +14,7 @@ $app->get('/api/farms/{id}', function ($request, $response, $args) {
 // farm
 // ==================================================
 $app->get('/api/farms/', function ($request, $response) {
-  $farms = FarmQuery::create()->find();
+  $farms = api\getCollection($request, FarmQuery::create());
   return api\mapCollection(
     $response, $farms,
     function ($farm) use ($request) {

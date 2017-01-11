@@ -1,5 +1,15 @@
 <?php namespace api;
 use Exception;
+
+function getCollection ($request, $query) {
+  $offset = $request->getParam('offset');
+  $limit = $request->getParam('limit');
+  if ($limit == null || $limit > CONFIG["MAX_LIMIT"]) {
+    $limit = CONFIG["MAX_LIMIT"];
+  }
+  return $query->paginate($offset, $limit);
+}
+
 function mapCollection ($response, $list, $callback) {
   $data = [];
   foreach($list as $item) $data[] = $callback($item);
