@@ -6,11 +6,7 @@
 // ==================================================
 $app->get('/api/events/{id}', function ($request, $response, $args) {
   $event = EventQuery::create()->findPK($args['id']);
-  if ($event) {
-    return $response->withJson(return_event($event, $request), 200);
-  }else{
-    return $response->withJson(["Error" => "Event not found"], 404);
-  }
+  return api\view($response, $event);
 
 });
 
