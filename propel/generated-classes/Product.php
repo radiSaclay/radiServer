@@ -16,12 +16,19 @@ class Product extends BaseProduct
 {
   // > CRUD API
   // Return Object as array
-  public function serialize () {
-    return [
-      "id" => $this->getId(),
-      "name" => $this->getName(),
-      "parentId" => $this->getParentId()
-    ];
+  public function serialize ($level = 1, $embed_level = -1) {
+    $product = ["id" => $this->getId(),
+      "name" => $this->getName()];
+    if ($level > 0){
+      $prod_query = new \ProductQuery();
+      $prod_parent = $prod_query->findPk($this->getParentId());
+      if($prod_parent) {
+        $product["parentId"] = $prod_parent->serialize($embed_level);
+      }else{
+        $product["parentId"] = null;
+      }
+    }
+    return $product;
   }
 
   public function unserialize ($data) {

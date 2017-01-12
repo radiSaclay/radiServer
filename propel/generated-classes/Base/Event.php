@@ -3,6 +3,8 @@
 namespace Base;
 
 use \Event as ChildEvent;
+use \EventProduct as ChildEventProduct;
+use \EventProductQuery as ChildEventProductQuery;
 use \EventQuery as ChildEventQuery;
 use \Farm as ChildFarm;
 use \FarmQuery as ChildFarmQuery;
@@ -15,6 +17,7 @@ use \UserQuery as ChildUserQuery;
 use \DateTime;
 use \Exception;
 use \PDO;
+use Map\EventProductTableMap;
 use Map\EventTableMap;
 use Map\PinTableMap;
 use Propel\Runtime\Propel;
@@ -80,11 +83,11 @@ abstract class Event implements ActiveRecordInterface
     protected $farm_id;
 
     /**
-     * The value for the product_id field.
+     * The value for the name field.
      *
-     * @var        int
+     * @var        string
      */
-    protected $product_id;
+    protected $name;
 
     /**
      * The value for the description field.
@@ -136,20 +139,31 @@ abstract class Event implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        ChildProduct
-     */
-    protected $aProduct;
-
-    /**
      * @var        ChildFarm
      */
     protected $aFarm;
+
+    /**
+     * @var        ObjectCollection|ChildEventProduct[] Collection to store aggregation of ChildEventProduct objects.
+     */
+    protected $collEventProducts;
+    protected $collEventProductsPartial;
 
     /**
      * @var        ObjectCollection|ChildPin[] Collection to store aggregation of ChildPin objects.
      */
     protected $collPins;
     protected $collPinsPartial;
+
+    /**
+     * @var        ObjectCollection|ChildProduct[] Cross Collection to store aggregation of ChildProduct objects.
+     */
+    protected $collProducts;
+
+    /**
+     * @var bool
+     */
+    protected $collProductsPartial;
 
     /**
      * @var        ObjectCollection|ChildUser[] Cross Collection to store aggregation of ChildUser objects.
@@ -171,9 +185,21 @@ abstract class Event implements ActiveRecordInterface
 
     /**
      * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildProduct[]
+     */
+    protected $productsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
      * @var ObjectCollection|ChildUser[]
      */
     protected $usersScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection|ChildEventProduct[]
+     */
+    protected $eventProductsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -417,13 +443,13 @@ abstract class Event implements ActiveRecordInterface
     }
 
     /**
-     * Get the [product_id] column value.
+     * Get the [name] column value.
      *
-     * @return int
+     * @return string
      */
-    public function getProductId()
+    public function getName()
     {
-        return $this->product_id;
+        return $this->name;
     }
 
     /**
@@ -571,28 +597,24 @@ abstract class Event implements ActiveRecordInterface
     } // setFarmId()
 
     /**
-     * Set the value of [product_id] column.
+     * Set the value of [name] column.
      *
-     * @param int $v new value
+     * @param string $v new value
      * @return $this|\Event The current object (for fluent API support)
      */
-    public function setProductId($v)
+    public function setName($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->product_id !== $v) {
-            $this->product_id = $v;
-            $this->modifiedColumns[EventTableMap::COL_PRODUCT_ID] = true;
-        }
-
-        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
-            $this->aProduct = null;
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[EventTableMap::COL_NAME] = true;
         }
 
         return $this;
-    } // setProductId()
+    } // setName()
 
     /**
      * Set the value of [description] column.
@@ -773,8 +795,8 @@ abstract class Event implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : EventTableMap::translateFieldName('FarmId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->farm_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : EventTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->product_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : EventTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->name = (null !== $col) ? (string) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : EventTableMap::translateFieldName('Description', TableMap::TYPE_PHPNAME, $indexType)];
             $this->description = (null !== $col) ? (string) $col : null;
@@ -844,9 +866,6 @@ abstract class Event implements ActiveRecordInterface
         if ($this->aFarm !== null && $this->farm_id !== $this->aFarm->getId()) {
             $this->aFarm = null;
         }
-        if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
-            $this->aProduct = null;
-        }
     } // ensureConsistency
 
     /**
@@ -886,10 +905,12 @@ abstract class Event implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aProduct = null;
             $this->aFarm = null;
+            $this->collEventProducts = null;
+
             $this->collPins = null;
 
+            $this->collProducts = null;
             $this->collUsers = null;
         } // if (deep)
     }
@@ -1011,13 +1032,6 @@ abstract class Event implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aProduct !== null) {
-                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
-                    $affectedRows += $this->aProduct->save($con);
-                }
-                $this->setProduct($this->aProduct);
-            }
-
             if ($this->aFarm !== null) {
                 if ($this->aFarm->isModified() || $this->aFarm->isNew()) {
                     $affectedRows += $this->aFarm->save($con);
@@ -1035,6 +1049,35 @@ abstract class Event implements ActiveRecordInterface
                 }
                 $this->resetModified();
             }
+
+            if ($this->productsScheduledForDeletion !== null) {
+                if (!$this->productsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    foreach ($this->productsScheduledForDeletion as $entry) {
+                        $entryPk = [];
+
+                        $entryPk[0] = $this->getId();
+                        $entryPk[1] = $entry->getId();
+                        $pks[] = $entryPk;
+                    }
+
+                    \EventProductQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+
+                    $this->productsScheduledForDeletion = null;
+                }
+
+            }
+
+            if ($this->collProducts) {
+                foreach ($this->collProducts as $product) {
+                    if (!$product->isDeleted() && ($product->isNew() || $product->isModified())) {
+                        $product->save($con);
+                    }
+                }
+            }
+
 
             if ($this->usersScheduledForDeletion !== null) {
                 if (!$this->usersScheduledForDeletion->isEmpty()) {
@@ -1064,6 +1107,23 @@ abstract class Event implements ActiveRecordInterface
                 }
             }
 
+
+            if ($this->eventProductsScheduledForDeletion !== null) {
+                if (!$this->eventProductsScheduledForDeletion->isEmpty()) {
+                    \EventProductQuery::create()
+                        ->filterByPrimaryKeys($this->eventProductsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->eventProductsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collEventProducts !== null) {
+                foreach ($this->collEventProducts as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
 
             if ($this->pinsScheduledForDeletion !== null) {
                 if (!$this->pinsScheduledForDeletion->isEmpty()) {
@@ -1111,8 +1171,8 @@ abstract class Event implements ActiveRecordInterface
         if ($this->isColumnModified(EventTableMap::COL_FARM_ID)) {
             $modifiedColumns[':p' . $index++]  = 'farm_id';
         }
-        if ($this->isColumnModified(EventTableMap::COL_PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'product_id';
+        if ($this->isColumnModified(EventTableMap::COL_NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'name';
         }
         if ($this->isColumnModified(EventTableMap::COL_DESCRIPTION)) {
             $modifiedColumns[':p' . $index++]  = 'description';
@@ -1149,8 +1209,8 @@ abstract class Event implements ActiveRecordInterface
                     case 'farm_id':
                         $stmt->bindValue($identifier, $this->farm_id, PDO::PARAM_INT);
                         break;
-                    case 'product_id':
-                        $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
+                    case 'name':
+                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
                     case 'description':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
@@ -1239,7 +1299,7 @@ abstract class Event implements ActiveRecordInterface
                 return $this->getFarmId();
                 break;
             case 1:
-                return $this->getProductId();
+                return $this->getName();
                 break;
             case 2:
                 return $this->getDescription();
@@ -1293,7 +1353,7 @@ abstract class Event implements ActiveRecordInterface
         $keys = EventTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getFarmId(),
-            $keys[1] => $this->getProductId(),
+            $keys[1] => $this->getName(),
             $keys[2] => $this->getDescription(),
             $keys[3] => $this->getPublishAt(),
             $keys[4] => $this->getBeginAt(),
@@ -1328,21 +1388,6 @@ abstract class Event implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aProduct) {
-
-                switch ($keyType) {
-                    case TableMap::TYPE_CAMELNAME:
-                        $key = 'product';
-                        break;
-                    case TableMap::TYPE_FIELDNAME:
-                        $key = 'product';
-                        break;
-                    default:
-                        $key = 'Product';
-                }
-
-                $result[$key] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
             if (null !== $this->aFarm) {
 
                 switch ($keyType) {
@@ -1357,6 +1402,21 @@ abstract class Event implements ActiveRecordInterface
                 }
 
                 $result[$key] = $this->aFarm->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collEventProducts) {
+
+                switch ($keyType) {
+                    case TableMap::TYPE_CAMELNAME:
+                        $key = 'eventProducts';
+                        break;
+                    case TableMap::TYPE_FIELDNAME:
+                        $key = 'event_products';
+                        break;
+                    default:
+                        $key = 'EventProducts';
+                }
+
+                $result[$key] = $this->collEventProducts->toArray(null, false, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collPins) {
 
@@ -1411,7 +1471,7 @@ abstract class Event implements ActiveRecordInterface
                 $this->setFarmId($value);
                 break;
             case 1:
-                $this->setProductId($value);
+                $this->setName($value);
                 break;
             case 2:
                 $this->setDescription($value);
@@ -1464,7 +1524,7 @@ abstract class Event implements ActiveRecordInterface
             $this->setFarmId($arr[$keys[0]]);
         }
         if (array_key_exists($keys[1], $arr)) {
-            $this->setProductId($arr[$keys[1]]);
+            $this->setName($arr[$keys[1]]);
         }
         if (array_key_exists($keys[2], $arr)) {
             $this->setDescription($arr[$keys[2]]);
@@ -1531,8 +1591,8 @@ abstract class Event implements ActiveRecordInterface
         if ($this->isColumnModified(EventTableMap::COL_FARM_ID)) {
             $criteria->add(EventTableMap::COL_FARM_ID, $this->farm_id);
         }
-        if ($this->isColumnModified(EventTableMap::COL_PRODUCT_ID)) {
-            $criteria->add(EventTableMap::COL_PRODUCT_ID, $this->product_id);
+        if ($this->isColumnModified(EventTableMap::COL_NAME)) {
+            $criteria->add(EventTableMap::COL_NAME, $this->name);
         }
         if ($this->isColumnModified(EventTableMap::COL_DESCRIPTION)) {
             $criteria->add(EventTableMap::COL_DESCRIPTION, $this->description);
@@ -1642,7 +1702,7 @@ abstract class Event implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setFarmId($this->getFarmId());
-        $copyObj->setProductId($this->getProductId());
+        $copyObj->setName($this->getName());
         $copyObj->setDescription($this->getDescription());
         $copyObj->setPublishAt($this->getPublishAt());
         $copyObj->setBeginAt($this->getBeginAt());
@@ -1654,6 +1714,12 @@ abstract class Event implements ActiveRecordInterface
             // important: temporarily setNew(false) because this affects the behavior of
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
+
+            foreach ($this->getEventProducts() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addEventProduct($relObj->copy($deepCopy));
+                }
+            }
 
             foreach ($this->getPins() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
@@ -1689,57 +1755,6 @@ abstract class Event implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
-    }
-
-    /**
-     * Declares an association between this object and a ChildProduct object.
-     *
-     * @param  ChildProduct $v
-     * @return $this|\Event The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setProduct(ChildProduct $v = null)
-    {
-        if ($v === null) {
-            $this->setProductId(NULL);
-        } else {
-            $this->setProductId($v->getId());
-        }
-
-        $this->aProduct = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildProduct object, it will not be re-added.
-        if ($v !== null) {
-            $v->addEvent($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildProduct object
-     *
-     * @param  ConnectionInterface $con Optional Connection object.
-     * @return ChildProduct The associated ChildProduct object.
-     * @throws PropelException
-     */
-    public function getProduct(ConnectionInterface $con = null)
-    {
-        if ($this->aProduct === null && ($this->product_id !== null)) {
-            $this->aProduct = ChildProductQuery::create()->findPk($this->product_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aProduct->addEvents($this);
-             */
-        }
-
-        return $this->aProduct;
     }
 
     /**
@@ -1804,9 +1819,265 @@ abstract class Event implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
+        if ('EventProduct' == $relationName) {
+            return $this->initEventProducts();
+        }
         if ('Pin' == $relationName) {
             return $this->initPins();
         }
+    }
+
+    /**
+     * Clears out the collEventProducts collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addEventProducts()
+     */
+    public function clearEventProducts()
+    {
+        $this->collEventProducts = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collEventProducts collection loaded partially.
+     */
+    public function resetPartialEventProducts($v = true)
+    {
+        $this->collEventProductsPartial = $v;
+    }
+
+    /**
+     * Initializes the collEventProducts collection.
+     *
+     * By default this just sets the collEventProducts collection to an empty array (like clearcollEventProducts());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initEventProducts($overrideExisting = true)
+    {
+        if (null !== $this->collEventProducts && !$overrideExisting) {
+            return;
+        }
+
+        $collectionClassName = EventProductTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collEventProducts = new $collectionClassName;
+        $this->collEventProducts->setModel('\EventProduct');
+    }
+
+    /**
+     * Gets an array of ChildEventProduct objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildEvent is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return ObjectCollection|ChildEventProduct[] List of ChildEventProduct objects
+     * @throws PropelException
+     */
+    public function getEventProducts(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collEventProductsPartial && !$this->isNew();
+        if (null === $this->collEventProducts || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collEventProducts) {
+                // return empty collection
+                $this->initEventProducts();
+            } else {
+                $collEventProducts = ChildEventProductQuery::create(null, $criteria)
+                    ->filterByEvent($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collEventProductsPartial && count($collEventProducts)) {
+                        $this->initEventProducts(false);
+
+                        foreach ($collEventProducts as $obj) {
+                            if (false == $this->collEventProducts->contains($obj)) {
+                                $this->collEventProducts->append($obj);
+                            }
+                        }
+
+                        $this->collEventProductsPartial = true;
+                    }
+
+                    return $collEventProducts;
+                }
+
+                if ($partial && $this->collEventProducts) {
+                    foreach ($this->collEventProducts as $obj) {
+                        if ($obj->isNew()) {
+                            $collEventProducts[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collEventProducts = $collEventProducts;
+                $this->collEventProductsPartial = false;
+            }
+        }
+
+        return $this->collEventProducts;
+    }
+
+    /**
+     * Sets a collection of ChildEventProduct objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $eventProducts A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return $this|ChildEvent The current object (for fluent API support)
+     */
+    public function setEventProducts(Collection $eventProducts, ConnectionInterface $con = null)
+    {
+        /** @var ChildEventProduct[] $eventProductsToDelete */
+        $eventProductsToDelete = $this->getEventProducts(new Criteria(), $con)->diff($eventProducts);
+
+
+        //since at least one column in the foreign key is at the same time a PK
+        //we can not just set a PK to NULL in the lines below. We have to store
+        //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
+        $this->eventProductsScheduledForDeletion = clone $eventProductsToDelete;
+
+        foreach ($eventProductsToDelete as $eventProductRemoved) {
+            $eventProductRemoved->setEvent(null);
+        }
+
+        $this->collEventProducts = null;
+        foreach ($eventProducts as $eventProduct) {
+            $this->addEventProduct($eventProduct);
+        }
+
+        $this->collEventProducts = $eventProducts;
+        $this->collEventProductsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related EventProduct objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related EventProduct objects.
+     * @throws PropelException
+     */
+    public function countEventProducts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collEventProductsPartial && !$this->isNew();
+        if (null === $this->collEventProducts || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collEventProducts) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getEventProducts());
+            }
+
+            $query = ChildEventProductQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByEvent($this)
+                ->count($con);
+        }
+
+        return count($this->collEventProducts);
+    }
+
+    /**
+     * Method called to associate a ChildEventProduct object to this object
+     * through the ChildEventProduct foreign key attribute.
+     *
+     * @param  ChildEventProduct $l ChildEventProduct
+     * @return $this|\Event The current object (for fluent API support)
+     */
+    public function addEventProduct(ChildEventProduct $l)
+    {
+        if ($this->collEventProducts === null) {
+            $this->initEventProducts();
+            $this->collEventProductsPartial = true;
+        }
+
+        if (!$this->collEventProducts->contains($l)) {
+            $this->doAddEventProduct($l);
+
+            if ($this->eventProductsScheduledForDeletion and $this->eventProductsScheduledForDeletion->contains($l)) {
+                $this->eventProductsScheduledForDeletion->remove($this->eventProductsScheduledForDeletion->search($l));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ChildEventProduct $eventProduct The ChildEventProduct object to add.
+     */
+    protected function doAddEventProduct(ChildEventProduct $eventProduct)
+    {
+        $this->collEventProducts[]= $eventProduct;
+        $eventProduct->setEvent($this);
+    }
+
+    /**
+     * @param  ChildEventProduct $eventProduct The ChildEventProduct object to remove.
+     * @return $this|ChildEvent The current object (for fluent API support)
+     */
+    public function removeEventProduct(ChildEventProduct $eventProduct)
+    {
+        if ($this->getEventProducts()->contains($eventProduct)) {
+            $pos = $this->collEventProducts->search($eventProduct);
+            $this->collEventProducts->remove($pos);
+            if (null === $this->eventProductsScheduledForDeletion) {
+                $this->eventProductsScheduledForDeletion = clone $this->collEventProducts;
+                $this->eventProductsScheduledForDeletion->clear();
+            }
+            $this->eventProductsScheduledForDeletion[]= clone $eventProduct;
+            $eventProduct->setEvent(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Event is new, it will return
+     * an empty collection; or if this Event has previously
+     * been saved, it will retrieve related EventProducts from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Event.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return ObjectCollection|ChildEventProduct[] List of ChildEventProduct objects
+     */
+    public function getEventProductsJoinProduct(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildEventProductQuery::create(null, $criteria);
+        $query->joinWith('Product', $joinBehavior);
+
+        return $this->getEventProducts($query, $con);
     }
 
     /**
@@ -2063,6 +2334,249 @@ abstract class Event implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collProducts collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProducts()
+     */
+    public function clearProducts()
+    {
+        $this->collProducts = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Initializes the collProducts crossRef collection.
+     *
+     * By default this just sets the collProducts collection to an empty collection (like clearProducts());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initProducts()
+    {
+        $collectionClassName = EventProductTableMap::getTableMap()->getCollectionClassName();
+
+        $this->collProducts = new $collectionClassName;
+        $this->collProductsPartial = true;
+        $this->collProducts->setModel('\Product');
+    }
+
+    /**
+     * Checks if the collProducts collection is loaded.
+     *
+     * @return bool
+     */
+    public function isProductsLoaded()
+    {
+        return null !== $this->collProducts;
+    }
+
+    /**
+     * Gets a collection of ChildProduct objects related by a many-to-many relationship
+     * to the current object by way of the event_product cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildEvent is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return ObjectCollection|ChildProduct[] List of ChildProduct objects
+     */
+    public function getProducts(Criteria $criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductsPartial && !$this->isNew();
+        if (null === $this->collProducts || null !== $criteria || $partial) {
+            if ($this->isNew()) {
+                // return empty collection
+                if (null === $this->collProducts) {
+                    $this->initProducts();
+                }
+            } else {
+
+                $query = ChildProductQuery::create(null, $criteria)
+                    ->filterByEvent($this);
+                $collProducts = $query->find($con);
+                if (null !== $criteria) {
+                    return $collProducts;
+                }
+
+                if ($partial && $this->collProducts) {
+                    //make sure that already added objects gets added to the list of the database.
+                    foreach ($this->collProducts as $obj) {
+                        if (!$collProducts->contains($obj)) {
+                            $collProducts[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProducts = $collProducts;
+                $this->collProductsPartial = false;
+            }
+        }
+
+        return $this->collProducts;
+    }
+
+    /**
+     * Sets a collection of Product objects related by a many-to-many relationship
+     * to the current object by way of the event_product cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param  Collection $products A Propel collection.
+     * @param  ConnectionInterface $con Optional connection object
+     * @return $this|ChildEvent The current object (for fluent API support)
+     */
+    public function setProducts(Collection $products, ConnectionInterface $con = null)
+    {
+        $this->clearProducts();
+        $currentProducts = $this->getProducts();
+
+        $productsScheduledForDeletion = $currentProducts->diff($products);
+
+        foreach ($productsScheduledForDeletion as $toDelete) {
+            $this->removeProduct($toDelete);
+        }
+
+        foreach ($products as $product) {
+            if (!$currentProducts->contains($product)) {
+                $this->doAddProduct($product);
+            }
+        }
+
+        $this->collProductsPartial = false;
+        $this->collProducts = $products;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Product objects related by a many-to-many relationship
+     * to the current object by way of the event_product cross-reference table.
+     *
+     * @param      Criteria $criteria Optional query object to filter the query
+     * @param      boolean $distinct Set to true to force count distinct
+     * @param      ConnectionInterface $con Optional connection object
+     *
+     * @return int the number of related Product objects
+     */
+    public function countProducts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductsPartial && !$this->isNew();
+        if (null === $this->collProducts || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProducts) {
+                return 0;
+            } else {
+
+                if ($partial && !$criteria) {
+                    return count($this->getProducts());
+                }
+
+                $query = ChildProductQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByEvent($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProducts);
+        }
+    }
+
+    /**
+     * Associate a ChildProduct to this object
+     * through the event_product cross reference table.
+     *
+     * @param ChildProduct $product
+     * @return ChildEvent The current object (for fluent API support)
+     */
+    public function addProduct(ChildProduct $product)
+    {
+        if ($this->collProducts === null) {
+            $this->initProducts();
+        }
+
+        if (!$this->getProducts()->contains($product)) {
+            // only add it if the **same** object is not already associated
+            $this->collProducts->push($product);
+            $this->doAddProduct($product);
+        }
+
+        return $this;
+    }
+
+    /**
+     *
+     * @param ChildProduct $product
+     */
+    protected function doAddProduct(ChildProduct $product)
+    {
+        $eventProduct = new ChildEventProduct();
+
+        $eventProduct->setProduct($product);
+
+        $eventProduct->setEvent($this);
+
+        $this->addEventProduct($eventProduct);
+
+        // set the back reference to this object directly as using provided method either results
+        // in endless loop or in multiple relations
+        if (!$product->isEventsLoaded()) {
+            $product->initEvents();
+            $product->getEvents()->push($this);
+        } elseif (!$product->getEvents()->contains($this)) {
+            $product->getEvents()->push($this);
+        }
+
+    }
+
+    /**
+     * Remove product of this object
+     * through the event_product cross reference table.
+     *
+     * @param ChildProduct $product
+     * @return ChildEvent The current object (for fluent API support)
+     */
+    public function removeProduct(ChildProduct $product)
+    {
+        if ($this->getProducts()->contains($product)) {
+            $eventProduct = new ChildEventProduct();
+            $eventProduct->setProduct($product);
+            if ($product->isEventsLoaded()) {
+                //remove the back reference if available
+                $product->getEvents()->removeObject($this);
+            }
+
+            $eventProduct->setEvent($this);
+            $this->removeEventProduct(clone $eventProduct);
+            $eventProduct->clear();
+
+            $this->collProducts->remove($this->collProducts->search($product));
+
+            if (null === $this->productsScheduledForDeletion) {
+                $this->productsScheduledForDeletion = clone $this->collProducts;
+                $this->productsScheduledForDeletion->clear();
+            }
+
+            $this->productsScheduledForDeletion->push($product);
+        }
+
+
+        return $this;
+    }
+
+    /**
      * Clears out the collUsers collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2312,14 +2826,11 @@ abstract class Event implements ActiveRecordInterface
      */
     public function clear()
     {
-        if (null !== $this->aProduct) {
-            $this->aProduct->removeEvent($this);
-        }
         if (null !== $this->aFarm) {
             $this->aFarm->removeEvent($this);
         }
         $this->farm_id = null;
-        $this->product_id = null;
+        $this->name = null;
         $this->description = null;
         $this->publish_at = null;
         $this->begin_at = null;
@@ -2345,8 +2856,18 @@ abstract class Event implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collEventProducts) {
+                foreach ($this->collEventProducts as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collPins) {
                 foreach ($this->collPins as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProducts) {
+                foreach ($this->collProducts as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2357,20 +2878,21 @@ abstract class Event implements ActiveRecordInterface
             }
         } // if ($deep)
 
+        $this->collEventProducts = null;
         $this->collPins = null;
+        $this->collProducts = null;
         $this->collUsers = null;
-        $this->aProduct = null;
         $this->aFarm = null;
     }
 
     /**
      * Return the string representation of this object
      *
-     * @return string
+     * @return string The value of the 'name' column
      */
     public function __toString()
     {
-        return (string) $this->exportTo(EventTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->getName();
     }
 
     // timestampable behavior

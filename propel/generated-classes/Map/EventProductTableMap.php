@@ -2,8 +2,8 @@
 
 namespace Map;
 
-use \Product;
-use \ProductQuery;
+use \EventProduct;
+use \EventProductQuery;
 use Propel\Runtime\Propel;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\InstancePoolTrait;
@@ -16,7 +16,7 @@ use Propel\Runtime\Map\TableMapTrait;
 
 
 /**
- * This class defines the structure of the 'product' table.
+ * This class defines the structure of the 'event_product' table.
  *
  *
  *
@@ -26,7 +26,7 @@ use Propel\Runtime\Map\TableMapTrait;
  * (i.e. if it's a text column type).
  *
  */
-class ProductTableMap extends TableMap
+class EventProductTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
@@ -34,7 +34,7 @@ class ProductTableMap extends TableMap
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = '.Map.ProductTableMap';
+    const CLASS_NAME = '.Map.EventProductTableMap';
 
     /**
      * The default database name for this class
@@ -44,22 +44,22 @@ class ProductTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'product';
+    const TABLE_NAME = 'event_product';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Product';
+    const OM_CLASS = '\\EventProduct';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Product';
+    const CLASS_DEFAULT = 'EventProduct';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 2;
 
     /**
      * The number of lazy-loaded columns
@@ -69,32 +69,17 @@ class ProductTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /**
-     * the column name for the parent_id field
+     * the column name for the event_id field
      */
-    const COL_PARENT_ID = 'product.parent_id';
+    const COL_EVENT_ID = 'event_product.event_id';
 
     /**
-     * the column name for the name field
+     * the column name for the product_id field
      */
-    const COL_NAME = 'product.name';
-
-    /**
-     * the column name for the id field
-     */
-    const COL_ID = 'product.id';
-
-    /**
-     * the column name for the created_at field
-     */
-    const COL_CREATED_AT = 'product.created_at';
-
-    /**
-     * the column name for the updated_at field
-     */
-    const COL_UPDATED_AT = 'product.updated_at';
+    const COL_PRODUCT_ID = 'event_product.product_id';
 
     /**
      * The default string format for model objects of the related table
@@ -108,11 +93,11 @@ class ProductTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('ParentId', 'Name', 'Id', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('parentId', 'name', 'id', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProductTableMap::COL_PARENT_ID, ProductTableMap::COL_NAME, ProductTableMap::COL_ID, ProductTableMap::COL_CREATED_AT, ProductTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('parent_id', 'name', 'id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('EventId', 'ProductId', ),
+        self::TYPE_CAMELNAME     => array('eventId', 'productId', ),
+        self::TYPE_COLNAME       => array(EventProductTableMap::COL_EVENT_ID, EventProductTableMap::COL_PRODUCT_ID, ),
+        self::TYPE_FIELDNAME     => array('event_id', 'product_id', ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -122,11 +107,11 @@ class ProductTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('ParentId' => 0, 'Name' => 1, 'Id' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        self::TYPE_CAMELNAME     => array('parentId' => 0, 'name' => 1, 'id' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        self::TYPE_COLNAME       => array(ProductTableMap::COL_PARENT_ID => 0, ProductTableMap::COL_NAME => 1, ProductTableMap::COL_ID => 2, ProductTableMap::COL_CREATED_AT => 3, ProductTableMap::COL_UPDATED_AT => 4, ),
-        self::TYPE_FIELDNAME     => array('parent_id' => 0, 'name' => 1, 'id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
+        self::TYPE_PHPNAME       => array('EventId' => 0, 'ProductId' => 1, ),
+        self::TYPE_CAMELNAME     => array('eventId' => 0, 'productId' => 1, ),
+        self::TYPE_COLNAME       => array(EventProductTableMap::COL_EVENT_ID => 0, EventProductTableMap::COL_PRODUCT_ID => 1, ),
+        self::TYPE_FIELDNAME     => array('event_id' => 0, 'product_id' => 1, ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -139,19 +124,16 @@ class ProductTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('product');
-        $this->setPhpName('Product');
+        $this->setName('event_product');
+        $this->setPhpName('EventProduct');
         $this->setIdentifierQuoting(false);
-        $this->setClassName('\\Product');
+        $this->setClassName('\\EventProduct');
         $this->setPackage('');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
-        $this->addForeignKey('parent_id', 'ParentId', 'INTEGER', 'product', 'id', false, null, null);
-        $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
-        $this->getColumn('name')->setPrimaryString(true);
-        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addForeignPrimaryKey('event_id', 'EventId', 'INTEGER' , 'event', 'id', true, null, null);
+        $this->addForeignPrimaryKey('product_id', 'ProductId', 'INTEGER' , 'product', 'id', true, null, null);
     } // initialize()
 
     /**
@@ -159,59 +141,74 @@ class ProductTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ProductRelatedByParentId', '\\Product', RelationMap::MANY_TO_ONE, array (
+        $this->addRelation('Event', '\\Event', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
-    0 => ':parent_id',
+    0 => ':event_id',
     1 => ':id',
   ),
 ), null, null, null, false);
-        $this->addRelation('ProductRelatedById', '\\Product', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':parent_id',
-    1 => ':id',
-  ),
-), null, null, 'ProductsRelatedById', false);
-        $this->addRelation('Order', '\\Order', RelationMap::ONE_TO_MANY, array (
+        $this->addRelation('Product', '\\Product', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
     0 => ':product_id',
     1 => ':id',
   ),
-), null, null, 'Orders', false);
-        $this->addRelation('EventProduct', '\\EventProduct', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':product_id',
-    1 => ':id',
-  ),
-), null, null, 'EventProducts', false);
-        $this->addRelation('FarmProduct', '\\FarmProduct', RelationMap::ONE_TO_MANY, array (
-  0 =>
-  array (
-    0 => ':product_id',
-    1 => ':id',
-  ),
-), null, null, 'FarmProducts', false);
-        $this->addRelation('Event', '\\Event', RelationMap::MANY_TO_MANY, array(), null, null, 'Events');
-        $this->addRelation('Farm', '\\Farm', RelationMap::MANY_TO_MANY, array(), null, null, 'Farms');
+), null, null, null, false);
     } // buildRelations()
 
     /**
+     * Adds an object to the instance pool.
      *
-     * Gets the list of behaviors registered for this table
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
      *
-     * @return array Associative array (name => parameters) of behaviors
+     * @param \EventProduct $obj A \EventProduct object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
-    public function getBehaviors()
+    public static function addInstanceToPool($obj, $key = null)
     {
-        return array(
-            'auto_add_pk' => array('name' => 'id', 'autoIncrement' => 'true', 'type' => 'INTEGER', ),
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_created_at' => 'false', 'disable_updated_at' => 'false', ),
-            'validate' => array('nameNull' => array ('column' => 'name','validator' => 'NotNull',), 'nameUnique' => array ('column' => 'name','validator' => 'Unique',), ),
-        );
-    } // getBehaviors()
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize([(null === $obj->getEventId() || is_scalar($obj->getEventId()) || is_callable([$obj->getEventId(), '__toString']) ? (string) $obj->getEventId() : $obj->getEventId()), (null === $obj->getProductId() || is_scalar($obj->getProductId()) || is_callable([$obj->getProductId(), '__toString']) ? (string) $obj->getProductId() : $obj->getProductId())]);
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \EventProduct object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \EventProduct) {
+                $key = serialize([(null === $value->getEventId() || is_scalar($value->getEventId()) || is_callable([$value->getEventId(), '__toString']) ? (string) $value->getEventId() : $value->getEventId()), (null === $value->getProductId() || is_scalar($value->getProductId()) || is_callable([$value->getProductId(), '__toString']) ? (string) $value->getProductId() : $value->getProductId())]);
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize([(null === $value[0] || is_scalar($value[0]) || is_callable([$value[0], '__toString']) ? (string) $value[0] : $value[0]), (null === $value[1] || is_scalar($value[1]) || is_callable([$value[1], '__toString']) ? (string) $value[1] : $value[1])]);
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \EventProduct object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -229,11 +226,11 @@ class ProductTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('EventId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return null === $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize([(null === $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('EventId', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('EventId', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('EventId', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('EventId', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('EventId', TableMap::TYPE_PHPNAME, $indexType)]), (null === $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)] || is_scalar($row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)]) || is_callable([$row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)], '__toString']) ? (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)] : $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)])]);
     }
 
     /**
@@ -250,11 +247,20 @@ class ProductTableMap extends TableMap
      */
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        return (int) $row[
+            $pks = [];
+
+        $pks[] = (int) $row[
             $indexType == TableMap::TYPE_NUM
-                ? 2 + $offset
-                : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
+                ? 0 + $offset
+                : self::translateFieldName('EventId', TableMap::TYPE_PHPNAME, $indexType)
         ];
+        $pks[] = (int) $row[
+            $indexType == TableMap::TYPE_NUM
+                ? 1 + $offset
+                : self::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)
+        ];
+
+        return $pks;
     }
 
     /**
@@ -270,7 +276,7 @@ class ProductTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ProductTableMap::CLASS_DEFAULT : ProductTableMap::OM_CLASS;
+        return $withPrefix ? EventProductTableMap::CLASS_DEFAULT : EventProductTableMap::OM_CLASS;
     }
 
     /**
@@ -284,22 +290,22 @@ class ProductTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *                         rethrown wrapped into a PropelException.
-     * @return array           (Product object, last column rank)
+     * @return array           (EventProduct object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ProductTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ProductTableMap::getInstanceFromPool($key))) {
+        $key = EventProductTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = EventProductTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ProductTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + EventProductTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ProductTableMap::OM_CLASS;
-            /** @var Product $obj */
+            $cls = EventProductTableMap::OM_CLASS;
+            /** @var EventProduct $obj */
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ProductTableMap::addInstanceToPool($obj, $key);
+            EventProductTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -322,18 +328,18 @@ class ProductTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ProductTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ProductTableMap::getInstanceFromPool($key))) {
+            $key = EventProductTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = EventProductTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
                 $results[] = $obj;
             } else {
-                /** @var Product $obj */
+                /** @var EventProduct $obj */
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ProductTableMap::addInstanceToPool($obj, $key);
+                EventProductTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -354,17 +360,11 @@ class ProductTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ProductTableMap::COL_PARENT_ID);
-            $criteria->addSelectColumn(ProductTableMap::COL_NAME);
-            $criteria->addSelectColumn(ProductTableMap::COL_ID);
-            $criteria->addSelectColumn(ProductTableMap::COL_CREATED_AT);
-            $criteria->addSelectColumn(ProductTableMap::COL_UPDATED_AT);
+            $criteria->addSelectColumn(EventProductTableMap::COL_EVENT_ID);
+            $criteria->addSelectColumn(EventProductTableMap::COL_PRODUCT_ID);
         } else {
-            $criteria->addSelectColumn($alias . '.parent_id');
-            $criteria->addSelectColumn($alias . '.name');
-            $criteria->addSelectColumn($alias . '.id');
-            $criteria->addSelectColumn($alias . '.created_at');
-            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.event_id');
+            $criteria->addSelectColumn($alias . '.product_id');
         }
     }
 
@@ -377,7 +377,7 @@ class ProductTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ProductTableMap::DATABASE_NAME)->getTable(ProductTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(EventProductTableMap::DATABASE_NAME)->getTable(EventProductTableMap::TABLE_NAME);
     }
 
     /**
@@ -385,16 +385,16 @@ class ProductTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-        $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProductTableMap::DATABASE_NAME);
-        if (!$dbMap->hasTable(ProductTableMap::TABLE_NAME)) {
-            $dbMap->addTableObject(new ProductTableMap());
+        $dbMap = Propel::getServiceContainer()->getDatabaseMap(EventProductTableMap::DATABASE_NAME);
+        if (!$dbMap->hasTable(EventProductTableMap::TABLE_NAME)) {
+            $dbMap->addTableObject(new EventProductTableMap());
         }
     }
 
     /**
-     * Performs a DELETE on the database, given a Product or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a EventProduct or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Product object or primary key or array of primary keys
+     * @param mixed               $values Criteria or EventProduct object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param  ConnectionInterface $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -405,27 +405,37 @@ class ProductTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(EventProductTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Product) { // it's a model object
+        } elseif ($values instanceof \EventProduct) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ProductTableMap::DATABASE_NAME);
-            $criteria->add(ProductTableMap::COL_ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(EventProductTableMap::DATABASE_NAME);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(EventProductTableMap::COL_EVENT_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(EventProductTableMap::COL_PRODUCT_ID, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
-        $query = ProductQuery::create()->mergeWith($criteria);
+        $query = EventProductQuery::create()->mergeWith($criteria);
 
         if ($values instanceof Criteria) {
-            ProductTableMap::clearInstancePool();
+            EventProductTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
             foreach ((array) $values as $singleval) {
-                ProductTableMap::removeInstanceFromPool($singleval);
+                EventProductTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -433,20 +443,20 @@ class ProductTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the product table.
+     * Deletes all rows from the event_product table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ProductQuery::create()->doDeleteAll($con);
+        return EventProductQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Product or Criteria object.
+     * Performs an INSERT on the database, given a EventProduct or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Product object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or EventProduct object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -455,22 +465,18 @@ class ProductTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(EventProductTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Product object
-        }
-
-        if ($criteria->containsKey(ProductTableMap::COL_ID) && $criteria->keyContainsValue(ProductTableMap::COL_ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductTableMap::COL_ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from EventProduct object
         }
 
 
         // Set the correct dbName
-        $query = ProductQuery::create()->mergeWith($criteria);
+        $query = EventProductQuery::create()->mergeWith($criteria);
 
         // use transaction because $criteria could contain info
         // for more than one table (I guess, conceivably)
@@ -479,7 +485,7 @@ class ProductTableMap extends TableMap
         });
     }
 
-} // ProductTableMap
+} // EventProductTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ProductTableMap::buildTableMap();
+EventProductTableMap::buildTableMap();

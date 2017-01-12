@@ -77,9 +77,9 @@ class EventTableMap extends TableMap
     const COL_FARM_ID = 'event.farm_id';
 
     /**
-     * the column name for the product_id field
+     * the column name for the name field
      */
-    const COL_PRODUCT_ID = 'event.product_id';
+    const COL_NAME = 'event.name';
 
     /**
      * the column name for the description field
@@ -128,10 +128,10 @@ class EventTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('FarmId', 'ProductId', 'Description', 'PublishAt', 'BeginAt', 'EndAt', 'Id', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_CAMELNAME     => array('farmId', 'productId', 'description', 'publishAt', 'beginAt', 'endAt', 'id', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(EventTableMap::COL_FARM_ID, EventTableMap::COL_PRODUCT_ID, EventTableMap::COL_DESCRIPTION, EventTableMap::COL_PUBLISH_AT, EventTableMap::COL_BEGIN_AT, EventTableMap::COL_END_AT, EventTableMap::COL_ID, EventTableMap::COL_CREATED_AT, EventTableMap::COL_UPDATED_AT, ),
-        self::TYPE_FIELDNAME     => array('farm_id', 'product_id', 'description', 'publish_at', 'begin_at', 'end_at', 'id', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('FarmId', 'Name', 'Description', 'PublishAt', 'BeginAt', 'EndAt', 'Id', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_CAMELNAME     => array('farmId', 'name', 'description', 'publishAt', 'beginAt', 'endAt', 'id', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(EventTableMap::COL_FARM_ID, EventTableMap::COL_NAME, EventTableMap::COL_DESCRIPTION, EventTableMap::COL_PUBLISH_AT, EventTableMap::COL_BEGIN_AT, EventTableMap::COL_END_AT, EventTableMap::COL_ID, EventTableMap::COL_CREATED_AT, EventTableMap::COL_UPDATED_AT, ),
+        self::TYPE_FIELDNAME     => array('farm_id', 'name', 'description', 'publish_at', 'begin_at', 'end_at', 'id', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
@@ -142,10 +142,10 @@ class EventTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('FarmId' => 0, 'ProductId' => 1, 'Description' => 2, 'PublishAt' => 3, 'BeginAt' => 4, 'EndAt' => 5, 'Id' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
-        self::TYPE_CAMELNAME     => array('farmId' => 0, 'productId' => 1, 'description' => 2, 'publishAt' => 3, 'beginAt' => 4, 'endAt' => 5, 'id' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
-        self::TYPE_COLNAME       => array(EventTableMap::COL_FARM_ID => 0, EventTableMap::COL_PRODUCT_ID => 1, EventTableMap::COL_DESCRIPTION => 2, EventTableMap::COL_PUBLISH_AT => 3, EventTableMap::COL_BEGIN_AT => 4, EventTableMap::COL_END_AT => 5, EventTableMap::COL_ID => 6, EventTableMap::COL_CREATED_AT => 7, EventTableMap::COL_UPDATED_AT => 8, ),
-        self::TYPE_FIELDNAME     => array('farm_id' => 0, 'product_id' => 1, 'description' => 2, 'publish_at' => 3, 'begin_at' => 4, 'end_at' => 5, 'id' => 6, 'created_at' => 7, 'updated_at' => 8, ),
+        self::TYPE_PHPNAME       => array('FarmId' => 0, 'Name' => 1, 'Description' => 2, 'PublishAt' => 3, 'BeginAt' => 4, 'EndAt' => 5, 'Id' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
+        self::TYPE_CAMELNAME     => array('farmId' => 0, 'name' => 1, 'description' => 2, 'publishAt' => 3, 'beginAt' => 4, 'endAt' => 5, 'id' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
+        self::TYPE_COLNAME       => array(EventTableMap::COL_FARM_ID => 0, EventTableMap::COL_NAME => 1, EventTableMap::COL_DESCRIPTION => 2, EventTableMap::COL_PUBLISH_AT => 3, EventTableMap::COL_BEGIN_AT => 4, EventTableMap::COL_END_AT => 5, EventTableMap::COL_ID => 6, EventTableMap::COL_CREATED_AT => 7, EventTableMap::COL_UPDATED_AT => 8, ),
+        self::TYPE_FIELDNAME     => array('farm_id' => 0, 'name' => 1, 'description' => 2, 'publish_at' => 3, 'begin_at' => 4, 'end_at' => 5, 'id' => 6, 'created_at' => 7, 'updated_at' => 8, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
@@ -166,8 +166,9 @@ class EventTableMap extends TableMap
         $this->setPackage('');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignKey('farm_id', 'FarmId', 'INTEGER', 'farm', 'id', false, null, null);
-        $this->addForeignKey('product_id', 'ProductId', 'INTEGER', 'product', 'id', false, null, null);
+        $this->addForeignKey('farm_id', 'FarmId', 'INTEGER', 'farm', 'id', true, null, null);
+        $this->addColumn('name', 'Name', 'VARCHAR', true, 255, null);
+        $this->getColumn('name')->setPrimaryString(true);
         $this->addColumn('description', 'Description', 'LONGVARCHAR', true, null, null);
         $this->addColumn('publish_at', 'PublishAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('begin_at', 'BeginAt', 'TIMESTAMP', false, null, null);
@@ -182,13 +183,6 @@ class EventTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Product', '\\Product', RelationMap::MANY_TO_ONE, array (
-  0 =>
-  array (
-    0 => ':product_id',
-    1 => ':id',
-  ),
-), null, null, null, false);
         $this->addRelation('Farm', '\\Farm', RelationMap::MANY_TO_ONE, array (
   0 =>
   array (
@@ -196,6 +190,13 @@ class EventTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, null, false);
+        $this->addRelation('EventProduct', '\\EventProduct', RelationMap::ONE_TO_MANY, array (
+  0 =>
+  array (
+    0 => ':event_id',
+    1 => ':id',
+  ),
+), null, null, 'EventProducts', false);
         $this->addRelation('Pin', '\\Pin', RelationMap::ONE_TO_MANY, array (
   0 =>
   array (
@@ -203,6 +204,7 @@ class EventTableMap extends TableMap
     1 => ':id',
   ),
 ), null, null, 'Pins', false);
+        $this->addRelation('Product', '\\Product', RelationMap::MANY_TO_MANY, array(), null, null, 'Products');
         $this->addRelation('User', '\\User', RelationMap::MANY_TO_MANY, array(), null, null, 'Users');
     } // buildRelations()
 
@@ -362,7 +364,7 @@ class EventTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(EventTableMap::COL_FARM_ID);
-            $criteria->addSelectColumn(EventTableMap::COL_PRODUCT_ID);
+            $criteria->addSelectColumn(EventTableMap::COL_NAME);
             $criteria->addSelectColumn(EventTableMap::COL_DESCRIPTION);
             $criteria->addSelectColumn(EventTableMap::COL_PUBLISH_AT);
             $criteria->addSelectColumn(EventTableMap::COL_BEGIN_AT);
@@ -372,7 +374,7 @@ class EventTableMap extends TableMap
             $criteria->addSelectColumn(EventTableMap::COL_UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.farm_id');
-            $criteria->addSelectColumn($alias . '.product_id');
+            $criteria->addSelectColumn($alias . '.name');
             $criteria->addSelectColumn($alias . '.description');
             $criteria->addSelectColumn($alias . '.publish_at');
             $criteria->addSelectColumn($alias . '.begin_at');

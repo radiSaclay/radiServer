@@ -60,16 +60,6 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildProductQuery rightJoinWithProductRelatedById() Adds a RIGHT JOIN clause and with to the query using the ProductRelatedById relation
  * @method     ChildProductQuery innerJoinWithProductRelatedById() Adds a INNER JOIN clause and with to the query using the ProductRelatedById relation
  *
- * @method     ChildProductQuery leftJoinEvent($relationAlias = null) Adds a LEFT JOIN clause to the query using the Event relation
- * @method     ChildProductQuery rightJoinEvent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Event relation
- * @method     ChildProductQuery innerJoinEvent($relationAlias = null) Adds a INNER JOIN clause to the query using the Event relation
- *
- * @method     ChildProductQuery joinWithEvent($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the Event relation
- *
- * @method     ChildProductQuery leftJoinWithEvent() Adds a LEFT JOIN clause and with to the query using the Event relation
- * @method     ChildProductQuery rightJoinWithEvent() Adds a RIGHT JOIN clause and with to the query using the Event relation
- * @method     ChildProductQuery innerJoinWithEvent() Adds a INNER JOIN clause and with to the query using the Event relation
- *
  * @method     ChildProductQuery leftJoinOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the Order relation
  * @method     ChildProductQuery rightJoinOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Order relation
  * @method     ChildProductQuery innerJoinOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the Order relation
@@ -79,6 +69,16 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildProductQuery leftJoinWithOrder() Adds a LEFT JOIN clause and with to the query using the Order relation
  * @method     ChildProductQuery rightJoinWithOrder() Adds a RIGHT JOIN clause and with to the query using the Order relation
  * @method     ChildProductQuery innerJoinWithOrder() Adds a INNER JOIN clause and with to the query using the Order relation
+ *
+ * @method     ChildProductQuery leftJoinEventProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the EventProduct relation
+ * @method     ChildProductQuery rightJoinEventProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the EventProduct relation
+ * @method     ChildProductQuery innerJoinEventProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the EventProduct relation
+ *
+ * @method     ChildProductQuery joinWithEventProduct($joinType = Criteria::INNER_JOIN) Adds a join clause and with to the query using the EventProduct relation
+ *
+ * @method     ChildProductQuery leftJoinWithEventProduct() Adds a LEFT JOIN clause and with to the query using the EventProduct relation
+ * @method     ChildProductQuery rightJoinWithEventProduct() Adds a RIGHT JOIN clause and with to the query using the EventProduct relation
+ * @method     ChildProductQuery innerJoinWithEventProduct() Adds a INNER JOIN clause and with to the query using the EventProduct relation
  *
  * @method     ChildProductQuery leftJoinFarmProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the FarmProduct relation
  * @method     ChildProductQuery rightJoinFarmProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FarmProduct relation
@@ -90,7 +90,7 @@ use Propel\Runtime\Exception\PropelException;
  * @method     ChildProductQuery rightJoinWithFarmProduct() Adds a RIGHT JOIN clause and with to the query using the FarmProduct relation
  * @method     ChildProductQuery innerJoinWithFarmProduct() Adds a INNER JOIN clause and with to the query using the FarmProduct relation
  *
- * @method     \ProductQuery|\EventQuery|\OrderQuery|\FarmProductQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
+ * @method     \ProductQuery|\OrderQuery|\EventProductQuery|\FarmProductQuery endUse() Finalizes a secondary criteria and merges it with its primary Criteria
  *
  * @method     ChildProduct findOne(ConnectionInterface $con = null) Return the first ChildProduct matching the query
  * @method     ChildProduct findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProduct matching the query, or a new ChildProduct object populated from the query conditions when no match is found
@@ -650,79 +650,6 @@ abstract class ProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Event object
-     *
-     * @param \Event|ObjectCollection $event the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductQuery The current query, for fluid interface
-     */
-    public function filterByEvent($event, $comparison = null)
-    {
-        if ($event instanceof \Event) {
-            return $this
-                ->addUsingAlias(ProductTableMap::COL_ID, $event->getProductId(), $comparison);
-        } elseif ($event instanceof ObjectCollection) {
-            return $this
-                ->useEventQuery()
-                ->filterByPrimaryKeys($event->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByEvent() only accepts arguments of type \Event or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Event relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return $this|ChildProductQuery The current query, for fluid interface
-     */
-    public function joinEvent($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Event');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Event');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Event relation Event object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return \EventQuery A secondary query class using the current class as primary query
-     */
-    public function useEventQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinEvent($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Event', '\EventQuery');
-    }
-
-    /**
      * Filter the query by a related \Order object
      *
      * @param \Order|ObjectCollection $order the related object to use as filter
@@ -796,6 +723,79 @@ abstract class ProductQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \EventProduct object
+     *
+     * @param \EventProduct|ObjectCollection $eventProduct the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function filterByEventProduct($eventProduct, $comparison = null)
+    {
+        if ($eventProduct instanceof \EventProduct) {
+            return $this
+                ->addUsingAlias(ProductTableMap::COL_ID, $eventProduct->getProductId(), $comparison);
+        } elseif ($eventProduct instanceof ObjectCollection) {
+            return $this
+                ->useEventProductQuery()
+                ->filterByPrimaryKeys($eventProduct->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByEventProduct() only accepts arguments of type \EventProduct or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the EventProduct relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return $this|ChildProductQuery The current query, for fluid interface
+     */
+    public function joinEventProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('EventProduct');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'EventProduct');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the EventProduct relation EventProduct object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return \EventProductQuery A secondary query class using the current class as primary query
+     */
+    public function useEventProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinEventProduct($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'EventProduct', '\EventProductQuery');
+    }
+
+    /**
      * Filter the query by a related \FarmProduct object
      *
      * @param \FarmProduct|ObjectCollection $farmProduct the related object to use as filter
@@ -866,6 +866,23 @@ abstract class ProductQuery extends ModelCriteria
         return $this
             ->joinFarmProduct($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'FarmProduct', '\FarmProductQuery');
+    }
+
+    /**
+     * Filter the query by a related Event object
+     * using the event_product table as cross reference
+     *
+     * @param Event $event the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function filterByEvent($event, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useEventProductQuery()
+            ->filterByEvent($event, $comparison)
+            ->endUse();
     }
 
     /**
