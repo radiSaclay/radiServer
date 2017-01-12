@@ -14,16 +14,18 @@ $app->get('/api/farms/{id}', function ($request, $response, $args) {
 // farm
 // ==================================================
 $app->get('/api/farms/', function ($request, $response) {
-  $farms = FarmQuery::create()->find();
-  return api\mapCollection(
-    $response, $farms,
-    function ($farm) use ($request) {
-      $data = $farm->serialize();
-      if (auth\isUser($request)) {
-        $user = auth\getUser($request);
-        $data["subscribed"] = $farm->hasSubscriber($user);
+  $user  = auth\isUser($request)
+    ? auth\getUser($request)
+    : false;
+  return api\listCollection(
+    $request, $response,
+    FarmQuery::create(),
+    function ($item) use ($user) {
+      if ($user) {
+        return [ "subscribed" => $item->hasSubscriber($user) ];
+      } else {
+        return [];
       }
-      return $data;
     }
   );
 });

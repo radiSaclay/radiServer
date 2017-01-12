@@ -12,7 +12,21 @@ use Base\User as BaseUser;
  * long as it does not already exist in the output directory.
  *
  */
-class User extends BaseUser
-{
+class User extends BaseUser {
 
+    // > CRUD API
+
+  public function serialize ($level = 1, $embed_level = 1) {
+    // Level 0
+    $item = [
+      "id" => $this->getId(),
+      "email" => $this->getEmail(),
+    ];
+    // Level 1
+    if ($level >= 1) {
+      $item["isAdmin"] = $this->getIsAdmin();
+    }
+
+    return $item;
+  }
 }
