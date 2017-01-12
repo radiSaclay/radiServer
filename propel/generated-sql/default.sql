@@ -75,6 +75,7 @@ CREATE TABLE `event`
 (
     `farm_id` INTEGER,
     `product_id` INTEGER,
+    `name` VARCHAR(255) NOT NULL,
     `description` TEXT NOT NULL,
     `publish_at` DATETIME,
     `begin_at` DATETIME,
@@ -119,6 +120,26 @@ CREATE TABLE `order`
         FOREIGN KEY (`farm_id`)
         REFERENCES `farm` (`id`),
     CONSTRAINT `order_fk_0f5ed8`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- event_product
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `event_product`;
+
+CREATE TABLE `event_product`
+(
+    `event_id` INTEGER NOT NULL,
+    `product_id` INTEGER NOT NULL,
+    PRIMARY KEY (`event_id`,`product_id`),
+    INDEX `event_product_fi_0f5ed8` (`product_id`),
+    CONSTRAINT `event_product_fk_b54508`
+        FOREIGN KEY (`event_id`)
+        REFERENCES `event` (`id`),
+    CONSTRAINT `event_product_fk_0f5ed8`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
 ) ENGINE=InnoDB;

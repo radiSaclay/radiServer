@@ -18,6 +18,12 @@ function mapCollection ($response, $list, $callback) {
   return $response->withJson($data, 200);
 }
 
+function mapCollectionNoResponse($list, $callback){
+  $data = [];
+  foreach($list as $item) $data[] = $callback($item);
+  return $data;
+}
+
 function view ($response, $item) {
   return $item
     ? $response->withJson($item->serialize(), 200)

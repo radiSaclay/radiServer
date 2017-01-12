@@ -46,14 +46,11 @@
   <!-- Event -->
   <table name="event" phpName="Event">
     <behavior name="auto_add_pk"/>
-    <column name="farm_id" type="integer"/>
-    <column name="product_id" type="integer"/>
-    <foreign-key foreignTable="product">
-      <reference local="product_id" foreign="id"/>
-    </foreign-key>
+    <column name="farm_id" type="integer" required="true"/>
     <foreign-key foreignTable="farm">
       <reference local="farm_id" foreign="id"/>
     </foreign-key>
+    <column name="name" type="varchar" required="true" primaryString="true"/>
     <column name="description" type="longvarchar" required="true"/>
     <column name="publish_at" type="timestamp"/>
     <column name="begin_at" type="timestamp"/>
@@ -83,7 +80,22 @@
     <column name="delivered_at" type="timestamp"/>
   </table>
 
+  <!-- Event - Product -->
+  <!-- This allows for one event to be associated with many products -->
+  <table name="event_product" isCrossRef="true">
+    <column name="event_id" type="integer" primaryKey="true"/>
+    <column name="product_id" type="integer" primaryKey="true"/>
+    <foreign-key foreignTable="event">
+      <reference local="event_id" foreign="id"/>
+    </foreign-key>
+    <foreign-key foreignTable="product">
+      <reference local="product_id" foreign="id"/>
+    </foreign-key>
+  </table>
+
+
   <!-- Farm - Event -->
+  <!-- This allows for one farm to be associated with many products -->
   <table name="farm_product" isCrossRef="true">
     <column name="farm_id" type="integer" primaryKey="true"/>
     <column name="product_id" type="integer" primaryKey="true"/>
@@ -96,6 +108,7 @@
   </table>
 
   <!-- User - Event -->
+  <!-- This allows for user to be associated with many events -->
   <table name="pin" isCrossRef="true">
     <column name="event_id" type="integer" primaryKey="true"/>
     <column name="user_id" type="integer" primaryKey="true"/>
@@ -107,7 +120,7 @@
     </foreign-key>
   </table>
 
-  <!-- User - Farm/Product -->
+  <!-- User - Farm/Product To Be Discussed -->
   <table name="subscription" phpName="Subscription">
     <behavior name="auto_add_pk"/>
     <column name="user_id" type="integer" primaryKey="true"/>
@@ -117,5 +130,37 @@
     <column name="subscription_id" type="integer" primaryKey="true"/>
     <column name="subscription_type" type="varchar" primaryKey="true"/>
   </table>
+
+  <!--&lt;!&ndash; User - Farm &ndash;&gt;-->
+  <!--<table name="farm_subscription" phpName="Subscription">-->
+  <!--<column name="farm_subscription_id" type="integer" primaryKey="true"/>-->
+
+  <!--<behavior name="auto_add_pk"/>-->
+  <!--<column name="user_id" type="integer" primaryKey="true"/>-->
+  <!--<foreign-key foreignTable="user">-->
+  <!--<reference local="user_id" foreign="id"/>-->
+  <!--</foreign-key>-->
+
+  <!--<column name="farm_id" type="integer" primaryKey="true"/>-->
+  <!--<foreign-key foreignTable="farm">-->
+  <!--<reference local="farm_id" foreign="id"/>-->
+  <!--</foreign-key>-->
+  <!--</table>-->
+
+  <!--&lt;!&ndash; User - Product &ndash;&gt;-->
+  <!--<table name="product_subscription" phpName="Subscription">-->
+  <!--<column name="product_subscription_id" type="integer" primaryKey="true"/>-->
+
+  <!--<behavior name="auto_add_pk"/>-->
+  <!--<column name="user_id" type="integer" primaryKey="true"/>-->
+  <!--<foreign-key foreignTable="user">-->
+  <!--<reference local="user_id" foreign="id"/>-->
+  <!--</foreign-key>-->
+
+  <!--<column name="product_id" type="integer" primaryKey="true"/>-->
+  <!--<foreign-key foreignTable="product">-->
+  <!--<reference local="product_id" foreign="id"/>-->
+  <!--</foreign-key>-->
+  <!--</table>-->
 
 </database>

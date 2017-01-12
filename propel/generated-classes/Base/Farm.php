@@ -1040,10 +1040,9 @@ abstract class Farm implements ActiveRecordInterface
 
             if ($this->eventsScheduledForDeletion !== null) {
                 if (!$this->eventsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->eventsScheduledForDeletion as $event) {
-                        // need to save related object because we set the relation to null
-                        $event->save($con);
-                    }
+                    \EventQuery::create()
+                        ->filterByPrimaryKeys($this->eventsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
                     $this->eventsScheduledForDeletion = null;
                 }
             }
@@ -2005,36 +2004,11 @@ abstract class Farm implements ActiveRecordInterface
                 $this->eventsScheduledForDeletion = clone $this->collEvents;
                 $this->eventsScheduledForDeletion->clear();
             }
-            $this->eventsScheduledForDeletion[]= $event;
+            $this->eventsScheduledForDeletion[]= clone $event;
             $event->setFarm(null);
         }
 
         return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Farm is new, it will return
-     * an empty collection; or if this Farm has previously
-     * been saved, it will retrieve related Events from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Farm.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return ObjectCollection|ChildEvent[] List of ChildEvent objects
-     */
-    public function getEventsJoinProduct(Criteria $criteria = null, ConnectionInterface $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildEventQuery::create(null, $criteria);
-        $query->joinWith('Product', $joinBehavior);
-
-        return $this->getEvents($query, $con);
     }
 
     /**

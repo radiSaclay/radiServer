@@ -34,8 +34,6 @@ $app->get('/api/events/', function ($request, $response) {
 
 function return_event($event, $request) {
   $data = $event->serialize();
-  $data["farmName"] = $event->getFarm()->getName();
-  $data["prodName"] = $event->getProduct()->getName();
   // if it is farmer requesting add number of users to each event
   if (auth\isFarmer($request)) {
     $data["pins"] = $event->countUsers();
