@@ -6,7 +6,7 @@
 // ==================================================
 $app->get('/api/events/{id}', function ($request, $response, $args) {
   $event = EventQuery::create()->findPK($args['id']);
-  return api\view($response, $event);
+  return \api\view($response, return_event($event, $request));
 
 });
 

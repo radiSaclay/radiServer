@@ -25,9 +25,15 @@ function mapCollectionNoResponse($list, $callback){
 }
 
 function view ($response, $item) {
-  return $item
-    ? $response->withJson($item->serialize(), 200)
-    : $response->withStatus(404);
+  if (is_callable([$item, 'serialize'])) {
+    return $item
+      ? $response->withJson($item->serialize(), 200)
+      : $response->withStatus(404);
+  }else{
+    return $item
+      ? $response->withJson($item, 200)
+      : $response->withStatus(404);
+  }
 }
 
 function listCollection ($request, $response, $query, $callback = '\api\nullFunction') {
