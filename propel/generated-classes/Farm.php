@@ -52,26 +52,30 @@ class Farm extends BaseFarm {
   // > CRUD API
 
   public function serialize ($level = 1, $embed_level = -1) {
-    // Level 0
-    $item = [
+    // Level -1 Only Id
+    if($level == -1){
+      $farm = [
+        "id" => $this->getId()
+      ];
+      return $farm;
+    }
+    // Level 0 Basic info, no children
+    $farm = [
       "id" => $this->getId(),
       "name" => $this->getName(),
+      "website" => $this->getWebsite()
     ];
-    // Level 1
+    // Level 1, everything + children
     if ($level >= 1) {
-      $item["address"] = $this->getAddress();
-      $item["website"] = $this->getWebsite();
-      $item["phone"] = $this->getPhone();
-      $item["email"] = $this->getEmail();
-      // Embed
-      if ($embed_level < 0) {
-        $item["ownerId"] = $this->getOwnerId();
-      } else {
-        $item["ownerId"] = $this->getUser()->serialize($embed_level);
-      }
+      $farm["address"] = $this->getAddress();
+      $farm["phone"] = $this->getPhone();
+      $farm["email"] = $this->getEmail();
+      // Embedded
+      $farm["ownerId"] = $this->getUser()->serialize($embed_level);
+
     }
 
-    return $item;
+    return $farm;
   }
 
   public function unserialize ($data) {
@@ -79,7 +83,7 @@ class Farm extends BaseFarm {
     if (isset($data["address"])) $this->setAddress($data["address"]);
     if (isset($data["website"])) $this->setWebsite($data["website"]);
     if (isset($data["phone"])) $this->setPhone($data["phone"]);
-    if (isset($data["phone"])) $this->setEmail($data["email"]);
+    if (isset($data["email"])) $this->setEmail($data["email"]);
   }
 
 }

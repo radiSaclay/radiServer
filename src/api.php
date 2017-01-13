@@ -32,11 +32,11 @@ function view ($response, $item) {
 
 function listCollection ($request, $response, $query, $callback = '\api\nullFunction') {
   $list = getCollection($request, $query);
-  $short = $request->getParam('short') ? 0 : 1;
-  $embed = $request->getParam('embed') ? 0 : -1;
+  $main_detail_lvl = $request->getParam('main_detail_lvl');
+  $embedded_detail_lvl = $request->getParam('embedded_detail_lvl');
   $data = [];
   foreach($list as $item) $data[] = array_merge(
-    $item->serialize($short, $embed),
+    $item->serialize($main_detail_lvl, $embedded_detail_lvl),
     $callback($item)
   );
   return $response->withJson($data, 200);

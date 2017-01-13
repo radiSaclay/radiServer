@@ -15,11 +15,19 @@ use Base\Event as BaseEvent;
 class Event extends BaseEvent {
 
   public function serialize ($level = 1, $embed_level = -1) {
-    // Level 0
+    // Level -1 Only Id
+    if($level == -1){
+      $event = [
+        "id" => $this->getId()
+      ];
+      return $event;
+    }
+    // Level 0 Basic info, no children
     $event = [
       "id" => $this->getId(),
       "name" => $this->getName()
     ];
+    // Level 1, everything + children
     if ($level > 0){
       // Level 1
       $products = $this->getProducts();
