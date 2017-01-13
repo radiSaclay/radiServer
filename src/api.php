@@ -18,12 +18,6 @@ function mapCollection ($response, $list, $callback) {
   return $response->withJson($data, 200);
 }
 
-function view ($response, $item) {
-  return $item
-    ? $response->withJson($item->serialize(), 200)
-    : $response->withStatus(404);
-}
-
 function listCollection ($request, $response, $query, $callback = '\api\nullFunction') {
   $list = getCollection($request, $query);
   $short = $request->getParam('short') ? 0 : 1;
@@ -34,6 +28,12 @@ function listCollection ($request, $response, $query, $callback = '\api\nullFunc
     $callback($item)
   );
   return $response->withJson($data, 200);
+}
+
+function view ($response, $item) {
+  return $item
+    ? $response->withJson($item->serialize(), 200)
+    : $response->withStatus(404);
 }
 
 function update ($request, $response, $item) {
