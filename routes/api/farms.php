@@ -21,11 +21,7 @@ $app->get('/api/farms/', function ($request, $response) {
     $request, $response,
     FarmQuery::create(),
     function ($item) use ($user) {
-      if ($user) {
-        return [ "subscribed" => $item->hasSubscriber($user) ];
-      } else {
-        return [];
-      }
+      if ($user) return [ "subscribed" => $item->hasSubscriber($user) ];
     }
   );
 });

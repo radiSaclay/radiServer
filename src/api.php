@@ -23,10 +23,13 @@ function listCollection ($request, $response, $query, $callback = '\api\nullFunc
   $short = $request->getParam('short') ? 0 : 1;
   $embed = $request->getParam('embed') ? 0 : -1;
   $data = [];
-  foreach($list as $item) $data[] = array_merge(
-    $item->serialize($short, $embed),
-    $callback($item)
-  );
+  foreach($list as $item) {
+    $base_data = $item->serialize($short, $embed);
+    $more_data = $callback($item);
+    $data[] = $more_data
+      ? array_merge($base_data, $more_data)
+      : $base_data;
+  }
   return $response->withJson($data, 200);
 }
 
