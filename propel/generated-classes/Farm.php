@@ -64,10 +64,13 @@ class Farm extends BaseFarm {
       $item["phone"] = $this->getPhone();
       $item["email"] = $this->getEmail();
       // Embed
+      $products = $this->getProducts();
       if ($embed_level < 0) {
         $item["ownerId"] = $this->getOwnerId();
+        $item["products"] = collection\getIds($products);
       } else {
-        $item["ownerId"] = $this->getUser()->serialize($embed_level);
+        $item["owner"] = $this->getUser()->serialize($embed_level);
+        $item["products"] = collection\serialize($products);
       }
     }
 
