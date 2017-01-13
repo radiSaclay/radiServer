@@ -5,7 +5,10 @@
 // Just returns the given farm
 // ==================================================
 $app->get('/api/farms/{id}', function ($request, $response, $args) {
-  return api\view($response, FarmQuery::create()->findPK($args['id']));
+  return api\view(
+    $request, $response,
+    FarmQuery::create()->findPK($args['id'])
+  );
 });
 
 // ==================================================

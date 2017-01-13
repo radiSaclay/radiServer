@@ -5,7 +5,10 @@
 // Returns the event id
 // ==================================================
 $app->get('/api/events/{id}', function ($request, $response, $args) {
-  return api\view($response, EventQuery::create()->findPK($args['id']));
+  return api\view(
+    $request, $response,
+    EventQuery::create()->findPK($args['id'])
+  );
 });
 
 // ==================================================

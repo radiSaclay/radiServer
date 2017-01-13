@@ -5,8 +5,11 @@
 // Returns the product id
 // ==================================================
 $app->get('/api/products/{id}', function ($request, $response, $args) {
-  return api\view($response, ProductQuery::create()->findPK($args['id']));
-})->add('mwIsLogged');
+  return api\view(
+    $request, $response,
+    ProductQuery::create()->findPK($args['id'])
+  );
+});
 
 // ==================================================
 // > GET /api/products/

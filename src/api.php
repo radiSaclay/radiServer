@@ -1,7 +1,7 @@
 <?php namespace api;
 use Exception;
 
-function nullFunction ($item) { return []; }
+function nullFunction ($item) {}
 
 function getCollection ($request, $query) {
   $offset = $request->getParam('offset');
@@ -33,10 +33,16 @@ function listCollection ($request, $response, $query, $callback = '\api\nullFunc
   return $response->withJson($data, 200);
 }
 
-function view ($response, $item) {
-  return $item
-    ? $response->withJson($item->serialize(), 200)
-    : $response->withStatus(404);
+function view ($request, $response, $item, $callback = '\api\nullFunction') {
+  if (!$item) {
+    return $response->withStatus(404);
+  }
+  $base_data = $item->serialize();
+  $more_data = $callback($item);
+  $data = $more_data
+    ? array_merge($base_data, $more_data)
+    : $base_data;
+  return $response->withJson($data, 200);
 }
 
 function update ($request, $response, $item) {
