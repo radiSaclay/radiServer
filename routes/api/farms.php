@@ -5,7 +5,16 @@
 // Just returns the given farm
 // ==================================================
 $app->get('/api/farms/{id}', function ($request, $response, $args) {
-  return api\view($response, FarmQuery::create()->findPK($args['id']));
+  $user  = auth\isUser($request)
+    ? auth\getUser($request)
+    : false;
+  return api\view(
+    $request, $response,
+    FarmQuery::create()->findPK($args['id']),
+    function ($item) use ($user) {
+      if ($user) return [ "subscribed" => $item->hasSubscriber($user) ];
+    }
+  );
 });
 
 // ==================================================
@@ -21,11 +30,7 @@ $app->get('/api/farms/', function ($request, $response) {
     $request, $response,
     FarmQuery::create(),
     function ($item) use ($user) {
-      if ($user) {
-        return [ "subscribed" => $item->hasSubscriber($user) ];
-      } else {
-        return [];
-      }
+      if ($user) return [ "subscribed" => $item->hasSubscriber($user) ];
     }
   );
 });

@@ -1,0 +1,18 @@
+language: php
+php:
+  - '5.4'
+  - '5.5'
+  - '5.6'
+  - '7.0'
+  - '7.1'
+  - hhvm
+  - nightly
+install:
+  - cd propel
+  - ../vendor/bin/propel model:build
+  - ../vendor/bin/propel migration:diff
+  - ../vendor/bin/propel migration:migrate
+  - cd ..
+  - composer update
+script:
+  - 
