@@ -14,20 +14,41 @@ use Base\Event as BaseEvent;
  */
 class Event extends BaseEvent {
 
-  public function serialize () {
-    return [
+  public function serialize ($level = 1, $embed_level = -1) {
+    // Level -1 Only Id
+    if($level == -1){
+      $event = [
+        "id" => $this->getId()
+      ];
+      return $event;
+    }
+    // Level 0 Basic info, no children
+    $event = [
       "id" => $this->getId(),
-      "farmId" => $this->getFarmId(),
-      "productId" => $this->getProductId(),
-      "description" => $this->getDescription(),
-      "publishAt" => $this->getPublishAt(),
-      "beginAt" => $this->getBeginAt(),
-      "endAt" => $this->getEndAt(),
+      "name" => $this->getName()
     ];
+    // Level 1, everything + children
+    if ($level > 0){
+      // Level 1
+      $products = $this->getProducts();
+      $event["farmId"] = $this->getFarm()->serialize($embed_level);
+      $event["productId"] = \api\mapCollectionNoResponse($this->getProducts(), function ($prod) use ($embed_level) {
+        $data = $prod->serialize($embed_level);
+        return $data;
+      });
+      $event["description"] = $this->getDescription();
+      $event["publishAt"] = $this->getPublishAt();
+      $event["beginAt"] = $this->getBeginAt();
+      $event["endAt"] = $this->getEndAt();
+
+
+    }
+    return $event;
   }
 
   public function unserialize ($data) {
     if (isset($data["productId"])) $this->setProductId($data["productId"]);
+    if (isset($data["name"])) $this->setDescription($data["name"]);
     if (isset($data["description"])) $this->setDescription($data["description"]);
     if (isset($data["publishAt"])) $this->setPublishAt($data["publishAt"]);
     if (isset($data["beginAt"])) $this->setBeginAt($data["beginAt"]);

@@ -19,23 +19,32 @@ $app->get('/api/events/{id}', function ($request, $response, $args) {
 // having pinned or not the event
 // ==================================================
 $app->get('/api/events/', function ($request, $response) {
+  // If the request comes from a farmer, $events = auth\getFarm($request)->getEvents() (Farm events)
+  // Else EventQuery::create()->find() (All events)
   $events = auth\isFarmer($request)
     ? auth\getFarm($request)->getEvents()
     : EventQuery::create()->find();
+
   return api\mapCollection(
     $response, $events,
     function ($event) use ($request) {
-      $data = $event->serialize();
-      if (auth\isFarmer($request)) {
-        $data["pins"] = $event->countUsers();
-      } else if (auth\isUser($request)) {
-        $user = auth\getUser($request);
-        $data["pinned"] = $event->getUsers()->contains($user);
-      }
-      return $data;
+      return return_event($event, $request);
     }
   );
 });
+
+function return_event($event, $request) {
+  $data = $event->serialize();
+  // if it is farmer requesting add number of users to each event
+  if (auth\isFarmer($request)) {
+    $data["pins"] = $event->countUsers();
+  } else if (auth\isUser($request)) {
+    // if it is user flag the events it pinned
+    $user = auth\getUser($request);
+    $data["pinned"] = $event->getUsers()->contains($user);
+  }
+  return $data;
+}
 
 // ==================================================
 // > POST /api/events/ Create event

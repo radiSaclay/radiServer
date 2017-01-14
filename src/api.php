@@ -18,13 +18,21 @@ function mapCollection ($response, $list, $callback) {
   return $response->withJson($data, 200);
 }
 
+
+function mapCollectionNoResponse($list, $callback){
+  $data = [];
+  foreach($list as $item) $data[] = $callback($item);
+  return $data;
+}
+
+
 function listCollection ($request, $response, $query, $callback = '\api\nullFunction') {
   $list = getCollection($request, $query);
-  $short = $request->getParam('short') ? 0 : 1;
-  $embed = $request->getParam('embed') ? 0 : -1;
+  $main_detail_lvl = $request->getParam('main_detail_lvl');
+  $embedded_detail_lvl = $request->getParam('embedded_detail_lvl');
   $data = [];
   foreach($list as $item) {
-    $base_data = $item->serialize($short, $embed);
+    $base_data = $item->serialize($main_detail_lvl, $embedded_detail_lvl);
     $more_data = $callback($item);
     $data[] = $more_data
       ? array_merge($base_data, $more_data)
@@ -37,7 +45,11 @@ function view ($request, $response, $item, $callback = '\api\nullFunction') {
   if (!$item) {
     return $response->withStatus(404);
   }
-  $base_data = $item->serialize();
+  if (is_callable([$item, 'serialize'])) {
+    $base_data = $item->serialize();
+  }else{
+    $base_data = $item;
+  }
   $more_data = $callback($item);
   $data = $more_data
     ? array_merge($base_data, $more_data)

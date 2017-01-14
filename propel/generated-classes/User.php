@@ -16,17 +16,24 @@ class User extends BaseUser {
 
     // > CRUD API
 
-  public function serialize ($level = 1, $embed_level = 1) {
-    // Level 0
-    $item = [
+  public function serialize ($level = 1, $embed_level = -1) {
+    // Level -1 Only Id
+    if($level == -1){
+      $user = [
+        "id" => $this->getId()
+      ];
+      return $user;
+    }
+    // Level 0 Basic info, no children
+    $user = [
       "id" => $this->getId(),
       "email" => $this->getEmail(),
     ];
-    // Level 1
+    // Level 1, everything + children
     if ($level >= 1) {
-      $item["isAdmin"] = $this->getIsAdmin();
+      $user["isAdmin"] = $this->getIsAdmin();
     }
 
-    return $item;
+    return $user;
   }
 }

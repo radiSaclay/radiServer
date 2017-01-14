@@ -21,7 +21,7 @@ $app->get('/api/products/', function ($request, $response) {
     $data = $products->serialize();
     return $data;
   });
-})->add('mwIsLogged');
+});
 
 // ==================================================
 // > POST /api/products/ Create product
