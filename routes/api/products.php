@@ -5,9 +5,15 @@
 // Returns the product id
 // ==================================================
 $app->get('/api/products/{id}', function ($request, $response, $args) {
+  $user = auth\isUser($request)
+    ? auth\getUser($request)
+    : false;
   return api\view(
     $request, $response,
-    ProductQuery::create()->findPK($args['id'])
+    ProductQuery::create()->findPK($args['id']),
+    function ($item) use ($user) {
+      if ($user) return [ "subscribed" => $item->hasSubscriber($user) ];
+    }
   );
 });
 
@@ -16,9 +22,15 @@ $app->get('/api/products/{id}', function ($request, $response, $args) {
 // Returns all the products
 // ==================================================
 $app->get('/api/products/', function ($request, $response) {
+  $user = auth\isUser($request)
+    ? auth\getUser($request)
+    : false;
   return api\listCollection(
     $request, $response,
-    ProductQuery::create()
+    ProductQuery::create(),
+    function ($item) use ($user) {
+      if ($user) return [ "subscribed" => $item->hasSubscriber($user) ];
+    }
   );
 });
 

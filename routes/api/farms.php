@@ -5,7 +5,7 @@
 // Just returns the given farm
 // ==================================================
 $app->get('/api/farms/{id}', function ($request, $response, $args) {
-  $user  = auth\isUser($request)
+  $user = auth\isUser($request)
     ? auth\getUser($request)
     : false;
   return api\view(
@@ -23,7 +23,7 @@ $app->get('/api/farms/{id}', function ($request, $response, $args) {
 // farm
 // ==================================================
 $app->get('/api/farms/', function ($request, $response) {
-  $user  = auth\isUser($request)
+  $user = auth\isUser($request)
     ? auth\getUser($request)
     : false;
   return api\listCollection(
