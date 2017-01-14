@@ -12,33 +12,76 @@ use Base\Product as BaseProduct;
 * long as it does not already exist in the output directory.
 *
 */
-class Product extends BaseProduct
-{
-  // > CRUD API
-  // Return Object as array
-  public function serialize ($level = 1, $embed_level = -1) {
-    // Level -1 Only Id
-    if($level == -1){
-      $product = [
-        "id" => $this->getId()
-      ];
-      return $product;
+class Product extends BaseProduct {
+
+  // > Subscriber
+
+  public function countSubscribers () {
+    return SubscriptionQuery::create()
+      ->filterBySubscriptionId($this->getId())
+      ->filterBySubscriptionType('product')
+      ->count();
+  }
+
+  public function hasSubscriber ($user) {
+    return SubscriptionQuery::create()
+      ->filterByUserId($user->getId())
+      ->filterBySubscriptionId($this->getId())
+      ->filterBySubscriptionType('product')
+      ->count() > 0;
+  }
+
+  public function addSubscriber ($user) {
+    if (!$this->hasSubscriber($user)) {
+      $sub = new Subscription();
+      $sub->setUserId($user->getId());
+      $sub->setSubscriptionId($this->getId());
+      $sub->setSubscriptionType('product');
+      $sub->save();
     }
-    // Level 0 Basic info, no children
-    $product = ["id" => $this->getId(),
-      "name" => $this->getName()];
-    // Level 1, everything + children
-    if ($level > 0){
-      $prod_query = new \ProductQuery();
-      $prod_parent = $prod_query->findPk($this->getParentId());
-      if($prod_parent) {
-        $product["parentId"] = $prod_parent->serialize($embed_level);
-      }
-      else{
-        $product["parentId"] = null;
+  }
+
+  public function removeSubscriber ($user) {
+    return SubscriptionQuery::create()
+      ->filterByUserId($user->getId())
+      ->filterBySubscriptionId($this->getId())
+      ->filterBySubscriptionType('product')
+      ->delete();
+  }
+
+  // > CRUD API
+
+  // Return Object as array
+  public function serialize ($level = 1, $embedded_level = -1) {
+    $product = [];
+    // Level 0
+    $product["id"] = $this->getId();
+    $product["name"] = $this->getName();
+    // Level 1
+    if ($level >= 1) {
+      // Embedded
+      if ($embedded_level < 0) {
+        $product["farms"] = \collection\getIds($this->getFarms());
+      } else {
+        $product["farms"] = \collection\serialize($this->getFarms(), $embedded_level);
       }
     }
     return $product;
+
+    // // Level 0 Basic info, no children
+    // $product = ["id" => $this->getId(),
+    //   "name" => $this->getName()];
+    // // Level 1, everything + children
+    // if ($level > 0){
+    //   $prod_query = new \ProductQuery();
+    //   $prod_parent = $prod_query->findPk($this->getParentId());
+    //   if($prod_parent) {
+    //     $product["parentId"] = $prod_parent->serialize($embedded_level);
+    //   }
+    //   else{
+    //     $product["parentId"] = null;
+    //   }
+    // }
   }
 
   public function unserialize ($data) {
@@ -50,14 +93,14 @@ class Product extends BaseProduct
 // Inserts having an invalid foreign key, it will send back a generic error
 // such as: Unable to execute INSERT statement [INSERT INTO product
 // (parent_id, name, id, created_at, updated_at) VALUES (:p0, :p1, :p2, :p3, :p4)]
-  public function setParent ($parentId) {
-    if(ProductQuery::create()
-    ->findPK($parentId)){
-      $this->setParentId($parentId);
-    }else{
-      throw new Exception("Parent does not exist");
-    }
-    $this->setParentId($parentId);
-  }
+  // public function setParent ($parentId) {
+  //   if(ProductQuery::create()
+  //   ->findPK($parentId)){
+  //     $this->setParentId($parentId);
+  //   }else{
+  //     throw new Exception("Parent does not exist");
+  //   }
+  //   $this->setParentId($parentId);
+  // }
 
 }

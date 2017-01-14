@@ -16,11 +16,10 @@ $app->get('/api/products/{id}', function ($request, $response, $args) {
 // Returns all the products
 // ==================================================
 $app->get('/api/products/', function ($request, $response) {
-  $products = ProductQuery::create()->find();
-  return api\mapCollection($response, $products, function ($products){
-    $data = $products->serialize();
-    return $data;
-  });
+  return api\listCollection(
+    $request, $response,
+    ProductQuery::create()
+  );
 });
 
 // ==================================================
