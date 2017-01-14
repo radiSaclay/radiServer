@@ -30,11 +30,8 @@
   <!-- Product -->
   <table name="product" phpName="Product">
     <behavior name="auto_add_pk"/>
-    <column name="parent_id" type="integer"/>
-    <foreign-key foreignTable="product">
-      <reference local="parent_id" foreign="id"/>
-    </foreign-key>
     <column name="name" type="varchar" required="true" primaryString="true"/>
+    <behavior name="nested_set" />
     <behavior name="timestampable" />
 
     <behavior name="validate">
@@ -50,7 +47,7 @@
     <foreign-key foreignTable="farm">
       <reference local="farm_id" foreign="id"/>
     </foreign-key>
-    <column name="name" type="varchar" required="true" primaryString="true"/>
+    <column name="title" type="varchar" required="true" primaryString="true"/>
     <column name="description" type="longvarchar" required="true"/>
     <column name="publish_at" type="timestamp"/>
     <column name="begin_at" type="timestamp"/>
