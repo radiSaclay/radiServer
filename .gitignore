@@ -4,6 +4,7 @@ vendor/
 src/config.php
 propel/generated-classes/Base/
 propel/generated-classes/Map/
+propel/generated-migrations/
 propel/generated-conf/
 propel/generated-sql/
 propel/propel.json
