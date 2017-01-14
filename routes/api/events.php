@@ -7,7 +7,14 @@
 $app->get('/api/events/{id}', function ($request, $response, $args) {
   return api\view(
     $request, $response,
-    EventQuery::create()->findPK($args['id'])
+    EventQuery::create()->findPK($args['id']),
+    function ($event) use ($request) {
+      if (auth\isFarmer($request)) {
+        return ["pins" => $event->countUsers()];
+      } else if (auth\isUser($request)) {
+        return ["pinned" => $event->getUsers()->contains(auth\getUser($request))];
+      }
+    }
   );
 });
 
@@ -20,36 +27,21 @@ $app->get('/api/events/{id}', function ($request, $response, $args) {
 // ==================================================
 $app->get('/api/events/', function ($request, $response) {
   $events = EventQuery::create();
+  // Filtering
+  $farmId = $request->getParam('farmId');
+  if ($farmId) $events = $events->filterByFarmId($farmId);
   return api\listCollection(
     $request, $response,
-    $events
+    $events,
+    function ($event) use ($request) {
+      if (auth\isFarmer($request)) {
+        return ["pins" => $event->countUsers()];
+      } else if (auth\isUser($request)) {
+        return ["pinned" => $event->getUsers()->contains(auth\getUser($request))];
+      }
+    }
   );
-  // If the request comes from a farmer, $events = auth\getFarm($request)->getEvents() (Farm events)
-  // Else EventQuery::create()->find() (All events)
-  // $events = auth\isFarmer($request)
-  //   ? auth\getFarm($request)->getEvents()
-  //   : EventQuery::create()->find();
-  //
-  // return api\mapCollection(
-  //   $response, $events,
-  //   function ($event) use ($request) {
-  //     return return_event($event, $request);
-  //   }
-  // );
 });
-
-function return_event($event, $request) {
-  $data = $event->serialize();
-  // if it is farmer requesting add number of users to each event
-  if (auth\isFarmer($request)) {
-    $data["pins"] = $event->countUsers();
-  } else if (auth\isUser($request)) {
-    // if it is user flag the events it pinned
-    $user = auth\getUser($request);
-    $data["pinned"] = $event->getUsers()->contains($user);
-  }
-  return $data;
-}
 
 // ==================================================
 // > POST /api/events/ Create event
