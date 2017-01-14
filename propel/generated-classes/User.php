@@ -14,22 +14,14 @@ use Base\User as BaseUser;
  */
 class User extends BaseUser {
 
-    // > CRUD API
+  // > CRUD API
 
-  public function serialize ($level = 1, $embed_level = -1) {
-    // Level -1 Only Id
-    if($level == -1){
-      $user = [
-        "id" => $this->getId()
-      ];
-      return $user;
-    }
-    // Level 0 Basic info, no children
-    $user = [
-      "id" => $this->getId(),
-      "email" => $this->getEmail(),
-    ];
-    // Level 1, everything + children
+  public function serialize ($level = 1, $embedded_level = -1, $request = null) {
+    $user = [];
+    // Level 0
+    $event["id"] = $this->getId();
+    $event["email"] = $this->getEmail();
+    // Level 1
     if ($level >= 1) {
       $user["isAdmin"] = $this->getIsAdmin();
     }
