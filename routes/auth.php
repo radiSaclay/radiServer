@@ -54,7 +54,7 @@ $app->delete('/auth/delete', function ($request, $response) {
 $app->get('/auth/user', function ($request, $response) {
   $user = auth\getUser($request);
   if ($user) {
-    $data = [ "id" => $user->getId(), "email" => $user->getEmail() ];
+    $data = $user->serialize();
     $farm = auth\getUserFarm($user);
     if ($farm) $data["farm"] = $farm->serialize();
     return $response->withJson($data, 200);

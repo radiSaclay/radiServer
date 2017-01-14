@@ -19,8 +19,8 @@ class User extends BaseUser {
   public function serialize ($level = 1, $embedded_level = -1, $request = null) {
     $user = [];
     // Level 0
-    $event["id"] = $this->getId();
-    $event["email"] = $this->getEmail();
+    $user["id"] = $this->getId();
+    $user["email"] = $this->getEmail();
     // Level 1
     if ($level >= 1) {
       $user["isAdmin"] = $this->getIsAdmin();
