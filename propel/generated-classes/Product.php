@@ -52,13 +52,16 @@ class Product extends BaseProduct {
   // > CRUD API
 
   // Return Object as array
-  public function serialize ($level = 1, $embedded_level = -1) {
+    public function serialize ($level = 1, $embedded_level = -1, $request = null) {
     $product = [];
     // Level 0
     $product["id"] = $this->getId();
     $product["name"] = $this->getName();
     // Level 1
     if ($level >= 1) {
+      if (auth\isUser($request)) {
+        $product["subscribed"] = $this->hasSubscriber(auth\getUser($request));
+      }
       // Embedded
       if ($embedded_level < 0) {
         $product["farms"] = \collection\getIds($this->getFarms());

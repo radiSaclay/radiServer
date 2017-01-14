@@ -23,8 +23,8 @@ function getParams ($request) {
   ];
 }
 
-function serializeItem ($item, $callback, $level, $embedded_level) {
-  $base_data = $item->serialize($level, $embedded_level);
+function serializeItem ($item, $callback, $level, $embedded_level, $request) {
+  $base_data = $item->serialize($level, $embedded_level, $request);
   $more_data = $callback($item);
   return $more_data
     ? array_merge($base_data, $more_data)
@@ -36,8 +36,8 @@ function listCollection ($request, $response, $query, $callback = '\api\nullFunc
   $params = getParams($request);
   $data = \collection\map(
     getCollection($request, $query),
-    function ($item) use ($params, $callback) {
-      return serializeItem($item, $callback, $params["level"], $params["embedded_level"]);
+    function ($item) use ($params, $callback, $request) {
+      return serializeItem($item, $callback, $params["level"], $params["embedded_level"], $request);
     }
   );
   return $response->withJson($data, 200);
@@ -45,7 +45,7 @@ function listCollection ($request, $response, $query, $callback = '\api\nullFunc
 
 function view ($request, $response, $item, $callback = '\api\nullFunction') {
   if (!$item) return $response->withStatus(404);
-  $data = serializeItem($item, $callback, 2, 0);
+  $data = serializeItem($item, $callback, 2, 0, $request);
   return $response->withJson($data, 200);
 }
 

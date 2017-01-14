@@ -7,14 +7,7 @@
 $app->get('/api/events/{id}', function ($request, $response, $args) {
   return api\view(
     $request, $response,
-    EventQuery::create()->findPK($args['id']),
-    function ($event) use ($request) {
-      if (auth\isFarmer($request)) {
-        return ["pins" => $event->countUsers()];
-      } else if (auth\isUser($request)) {
-        return ["pinned" => $event->getUsers()->contains(auth\getUser($request))];
-      }
-    }
+    EventQuery::create()->findPK($args['id'])
   );
 });
 
@@ -32,14 +25,7 @@ $app->get('/api/events/', function ($request, $response) {
   if ($farmId) $events = $events->filterByFarmId($farmId);
   return api\listCollection(
     $request, $response,
-    $events,
-    function ($event) use ($request) {
-      if (auth\isFarmer($request)) {
-        return ["pins" => $event->countUsers()];
-      } else if (auth\isUser($request)) {
-        return ["pinned" => $event->getUsers()->contains(auth\getUser($request))];
-      }
-    }
+    $events
   );
 });
 

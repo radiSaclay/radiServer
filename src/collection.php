@@ -13,11 +13,11 @@ function getIds ($list) {
   );
 }
 
-function serialize ($list, $level = 1, $embed_level = -1) {
+function serialize ($list, $level = 1, $embed_level = -1, $request = null) {
   return map(
     $list,
-    function ($item) use ($level, $embed_level) {
-      return $item->serialize($level, $embed_level);
+    function ($item) use ($level, $embed_level, $request) {
+      return $item->serialize($level, $embed_level, $request);
     }
   );
 }

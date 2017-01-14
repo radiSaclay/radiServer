@@ -14,7 +14,7 @@ use Base\Event as BaseEvent;
  */
 class Event extends BaseEvent {
 
-  public function serialize ($level = 1, $embedded_level = -1) {
+    public function serialize ($level = 1, $embedded_level = -1, $request = null) {
     $event = [];
     // Level 0
     $event["id"] = $this->getId();
@@ -25,6 +25,10 @@ class Event extends BaseEvent {
       $event["publishAt"] = $this->getPublishAt();
       $event["BeginAt"] = $this->getBeginAt();
       $event["EndAt"] = $this->getEndAt();
+      $farm["pins"] = $this->countUsers();
+      if (auth\isUser($request)) {
+        $event["pinned"] = $this->getUsers()->contains(auth\getUser($request));
+      }
       // Embedded
       if ($embedded_level < 0) {
         $event["farmId"] = $this->getFarm()->getId();
