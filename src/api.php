@@ -1,6 +1,7 @@
 <?php namespace api;
 use Exception;
 
+// = Helpers ===
 function nullFunction ($item) {}
 
 function getCollection ($request, $query) {
@@ -12,48 +13,39 @@ function getCollection ($request, $query) {
   return $query->paginate($offset, $limit);
 }
 
-function mapCollection ($response, $list, $callback) {
-  $data = [];
-  foreach($list as $item) $data[] = $callback($item);
-  return $response->withJson($data, 200);
+function getParams ($request) {
+  $level = $request->getParam('details');
+  $level = ($level != null) ? intval($level) : 1;
+  $embedded_level = $request->getParam('embedded') ? 0 : -1;
+  return [
+    "level" => $level,
+    "embedded_level" => $embedded_level,
+  ];
 }
 
-
-function mapCollectionNoResponse($list, $callback){
-  $data = [];
-  foreach($list as $item) $data[] = $callback($item);
-  return $data;
+function serializeItem ($item, $callback, $level, $embedded_level) {
+  $base_data = $item->serialize($level, $embedded_level);
+  $more_data = $callback($item);
+  return $more_data
+    ? array_merge($base_data, $more_data)
+    : $base_data;
 }
 
-
+// = CRUD ===
 function listCollection ($request, $response, $query, $callback = '\api\nullFunction') {
-  $list = getCollection($request, $query);
-  $main_detail_lvl = $request->getParam('main_detail_lvl');
-  $embedded_detail_lvl = $request->getParam('embedded_detail_lvl');
-  $data = [];
-  foreach($list as $item) {
-    $base_data = $item->serialize($main_detail_lvl, $embedded_detail_lvl);
-    $more_data = $callback($item);
-    $data[] = $more_data
-      ? array_merge($base_data, $more_data)
-      : $base_data;
-  }
+  $params = getParams($request);
+  $data = \collection\map(
+    getCollection($request, $query),
+    function ($item) use ($params, $callback) {
+      return serializeItem($item, $callback, $params["level"], $params["embedded_level"]);
+    }
+  );
   return $response->withJson($data, 200);
 }
 
 function view ($request, $response, $item, $callback = '\api\nullFunction') {
-  if (!$item) {
-    return $response->withStatus(404);
-  }
-  if (is_callable([$item, 'serialize'])) {
-    $base_data = $item->serialize();
-  }else{
-    $base_data = $item;
-  }
-  $more_data = $callback($item);
-  $data = $more_data
-    ? array_merge($base_data, $more_data)
-    : $base_data;
+  if (!$item) return $response->withStatus(404);
+  $data = serializeItem($item, $callback, 2, 0);
   return $response->withJson($data, 200);
 }
 
