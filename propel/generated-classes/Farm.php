@@ -52,29 +52,23 @@ class Farm extends BaseFarm {
   // > CRUD API
 
   public function serialize ($level = 1, $embed_level = -1) {
-    // Level -1 Only Id
-    if($level == -1){
-      $farm = [
-        "id" => $this->getId()
-      ];
-      return $farm;
-    }
-    // Level 0 Basic info, no children
-    $farm = [
-      "id" => $this->getId(),
-      "name" => $this->getName(),
-      "website" => $this->getWebsite()
-    ];
-    // Level 1, everything + children
+    $farms = [];
+    // Level 0
+    $farm["id"] = $this->getId();
+    $farm["name"] = $this->getName();
+    // Level 1
     if ($level >= 1) {
+      $farm["website"] = $this->getWebsite();
       $farm["address"] = $this->getAddress();
       $farm["phone"] = $this->getPhone();
       $farm["email"] = $this->getEmail();
       // Embedded
-      $farm["ownerId"] = $this->getUser()->serialize($embed_level);
-
+      if ($embed_level < 0) {
+        $farm["ownerId"] = $this->getUser()->getId();
+      } else {
+        $farm["owner"] = $this->getUser()->serialize($embed_level);
+      }
     }
-
     return $farm;
   }
 
