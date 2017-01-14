@@ -19,18 +19,23 @@ $app->get('/api/events/{id}', function ($request, $response, $args) {
 // having pinned or not the event
 // ==================================================
 $app->get('/api/events/', function ($request, $response) {
+  $events = EventQuery::create();
+  return api\listCollection(
+    $request, $response,
+    $events
+  );
   // If the request comes from a farmer, $events = auth\getFarm($request)->getEvents() (Farm events)
   // Else EventQuery::create()->find() (All events)
-  $events = auth\isFarmer($request)
-    ? auth\getFarm($request)->getEvents()
-    : EventQuery::create()->find();
-
-  return api\mapCollection(
-    $response, $events,
-    function ($event) use ($request) {
-      return return_event($event, $request);
-    }
-  );
+  // $events = auth\isFarmer($request)
+  //   ? auth\getFarm($request)->getEvents()
+  //   : EventQuery::create()->find();
+  //
+  // return api\mapCollection(
+  //   $response, $events,
+  //   function ($event) use ($request) {
+  //     return return_event($event, $request);
+  //   }
+  // );
 });
 
 function return_event($event, $request) {

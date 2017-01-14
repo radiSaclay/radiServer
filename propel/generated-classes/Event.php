@@ -14,34 +14,25 @@ use Base\Event as BaseEvent;
  */
 class Event extends BaseEvent {
 
-  public function serialize ($level = 1, $embed_level = -1) {
-    // Level -1 Only Id
-    if($level == -1){
-      $event = [
-        "id" => $this->getId()
-      ];
-      return $event;
-    }
-    // Level 0 Basic info, no children
-    $event = [
-      "id" => $this->getId(),
-      "name" => $this->getName()
-    ];
-    // Level 1, everything + children
-    if ($level > 0){
-      // Level 1
-      $products = $this->getProducts();
-      $event["farmId"] = $this->getFarm()->serialize($embed_level);
-      $event["productId"] = \api\mapCollectionNoResponse($this->getProducts(), function ($prod) use ($embed_level) {
-        $data = $prod->serialize($embed_level);
-        return $data;
-      });
+  public function serialize ($level = 1, $embedded_level = -1) {
+    $event = [];
+    // Level 0
+    $event["id"] = $this->getId();
+    $event["title"] = $this->getTitle();
+    // Level 1
+    if ($level >= 1) {
       $event["description"] = $this->getDescription();
       $event["publishAt"] = $this->getPublishAt();
-      $event["beginAt"] = $this->getBeginAt();
-      $event["endAt"] = $this->getEndAt();
-
-
+      $event["BeginAt"] = $this->getBeginAt();
+      $event["EndAt"] = $this->getEndAt();
+      // Embedded
+      if ($embedded_level < 0) {
+        $event["farmId"] = $this->getFarm()->getId();
+        $event["products"] = \collection\getIds($this->getProducts());
+      } else {
+        $event["farm"] = $this->getFarm()->serialize($embedded_level);
+        $event["products"] = \collection\serialize($this->getProducts(), $embedded_level);
+      }
     }
     return $event;
   }
