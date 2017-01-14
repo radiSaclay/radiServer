@@ -59,7 +59,7 @@ class Product extends BaseProduct {
     $product["name"] = $this->getName();
     // Level 1
     if ($level >= 1) {
-      if (auth\isUser($request)) {
+      if ($request && auth\isUser($request)) {
         $product["subscribed"] = $this->hasSubscriber(auth\getUser($request));
       }
       // Embedded

@@ -26,7 +26,7 @@ class Event extends BaseEvent {
       $event["BeginAt"] = $this->getBeginAt();
       $event["EndAt"] = $this->getEndAt();
       $farm["pins"] = $this->countUsers();
-      if (auth\isUser($request)) {
+      if ($request && auth\isUser($request)) {
         $event["pinned"] = $this->getUsers()->contains(auth\getUser($request));
       }
       // Embedded

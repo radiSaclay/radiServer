@@ -62,7 +62,7 @@ class Farm extends BaseFarm {
       $farm["address"] = $this->getAddress();
       $farm["phone"] = $this->getPhone();
       $farm["email"] = $this->getEmail();
-      if (auth\isUser($request)) {
+      if ($request && auth\isUser($request)) {
         $farm["subscribed"] = $this->hasSubscriber(auth\getUser($request));
       }
       // Embedded
