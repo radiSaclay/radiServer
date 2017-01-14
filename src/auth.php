@@ -47,17 +47,7 @@ function isAdmin ($request) {
 
 function createUserToken ($user) {
   $lifespan = CONFIG["TOKEN_LIFESPAN"];
-  if (isUserFarmer($user)) {
-    return \jwt\createToken([
-      "user_id" => $user->getId(),
-      "user_type" => "farmer",
-      "farm_id" => getUserFarm($user)->getId(),
-    ], $lifespan);
-  } else {
-    return \jwt\createToken([
-      "user_id" => $user->getId(),
-      "user_type" => isUserAdmin($user) ? "admin" : "user",
-    ], $lifespan);
-  }
+  return \jwt\createToken([
+    "user_id" => $user->getId(),
+  ], $lifespan);
 }
-

@@ -16,8 +16,7 @@ function mwIsLogged ($request, $response, $next) {
 };
 
 function mwIsFarmer ($request, $response, $next) {
-  $token = jwt\getToken($request);
-  if ($token && $token["user_type"] == "farmer") {
+  if (\auth\isFarmer($request)) {
     return $next($request, $response);
   } else {
     return $response->withStatus(401);
@@ -25,8 +24,7 @@ function mwIsFarmer ($request, $response, $next) {
 };
 
 function mwIsAdmin ($request, $response, $next) {
-  $token = jwt\getToken($request);
-  if ($token && $token["user_type"] == "admin") {
+  if (\auth\isAdmin($request)) {
     return $next($request, $response);
   } else {
     return $response->withStatus(401);
