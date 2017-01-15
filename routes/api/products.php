@@ -4,6 +4,22 @@
 // > GET /api/products/{id}
 // Returns the product id
 // ==================================================
+$app->get('/api/products/init', function ($request, $response, $args) {
+  if (ProductQuery::create()->count() == 0) {
+    $all = new Product();
+    $all->setName("Tout");
+    $all->makeRoot();
+    $all->save();
+    return api\view($request, $response, $all);
+  } else {
+    var_dump(ProductQuery::create()->count());
+  }
+})->add('mwIsAdmin');
+
+// ==================================================
+// > GET /api/products/{id}
+// Returns the product id
+// ==================================================
 $app->get('/api/products/{id}', function ($request, $response, $args) {
   return api\view(
     $request, $response,
@@ -26,13 +42,10 @@ $app->get('/api/products/', function ($request, $response) {
 // > POST /api/products/ Create product
 // ==================================================
 $app->post('/api/products/', function ($request, $response) {
-  try {
-    $product = new Product();
-    return api\update($request, $response, $product);
-  } catch (Exception $e) {
-    return $response->withStatus(400)
-    ->withJson(["Error = " => " " . $e->getMessage()]);
-  }
+  return api\update(
+    $request, $response,
+    new Product()
+  );
 })->add('mwIsAdmin');
 
 // ==================================================

@@ -50,12 +50,17 @@ function view ($request, $response, $item, $callback = '\api\nullFunction') {
 }
 
 function update ($request, $response, $item) {
-  $item->unserialize($request->getParsedBody());
-  if(!$item->validate()){
-    foreach ($item->getValidationFailures() as $failure) {
-      throw new Exception("Property: ".$failure->getPropertyPath()." failed the following test: ".$failure->getMessage()."\n");
+  try {
+    $item->unserialize($request->getParsedBody());
+    if (!$item->validate()) {
+      $errors = [];
+      foreach ($item->getValidationFailures() as $failure)
+        $errors[] = "Property ".$failure->getPropertyPath().": ".$failure->getMessage()."\n";
+      return $response->withJson([ "errors" => $errors ], 400);
     }
+    $item->save();
+    return $response->withJson($item->serialize(), 200);
+  } catch (Exception $e) {
+    return $response->withJson([ "errors" => [$e->getMessage()] ], 400);
   }
-  $item->save();
-  return $response->withJson($item->serialize(), 200);
 }
