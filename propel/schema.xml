@@ -10,6 +10,11 @@
     <unique>
       <unique-column name="email"/>
     </unique>
+
+    <behavior name="validate">
+      <parameter name="emailNull" value="{ column: email, validator: NotNull }" />
+      <parameter name="emailUnique" value="{ column: email, validator: Unique } }" />
+    </behavior>
   </table>
 
   <!-- Farm -->
@@ -25,6 +30,11 @@
     <column name="phone" type="varchar"/>
     <column name="email" type="varchar"/>
     <behavior name="timestampable"/>
+
+    <behavior name="validate">
+      <parameter name="nameNull" value="{ column: name, validator: NotNull }" />
+      <parameter name="nameUnique" value="{ column: name, validator: Unique } }" />
+    </behavior>
   </table>
 
   <!-- Product -->
@@ -35,8 +45,8 @@
     <behavior name="timestampable" />
 
     <behavior name="validate">
-      <parameter name="nameNull" value="{column: name, validator: NotNull}" />
-      <parameter name="nameUnique" value="{column: name, validator: Unique}" />
+      <parameter name="nameNull" value="{ column: name, validator: NotNull }" />
+      <parameter name="nameUnique" value="{ column: name, validator: Unique }" />
     </behavior>
   </table>
 
@@ -53,6 +63,11 @@
     <column name="begin_at" type="timestamp"/>
     <column name="end_at" type="timestamp"/>
     <behavior name="timestampable" />
+
+    <behavior name="validate">
+      <parameter name="titleNull" value="{ column: title, validator: NotNull }" />
+      <parameter name="titleUnique" value="{ column: title, validator: Unique } }" />
+    </behavior>
   </table>
 
   <!-- Relations -->
