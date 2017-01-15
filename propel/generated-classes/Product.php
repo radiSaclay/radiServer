@@ -65,45 +65,37 @@ class Product extends BaseProduct {
       // Embedded
       if ($embedded_level < 0) {
         $product["farms"] = \collection\getIds($this->getFarms());
+        if ($this->isInTree()) {
+          $product["children"] = \collection\getIds($this->getChildren());
+          $product["ancestors"] = \collection\getIds($this->getAncestors());
+        }
       } else {
         $product["farms"] = \collection\serialize($this->getFarms(), $embedded_level);
+        if ($this->isInTree()) {
+          $product["children"] = \collection\serialize($this->getChildren(), $embedded_level);
+          $product["ancestors"] = \collection\serialize($this->getAncestors(), $embedded_level);
+        }
       }
     }
     return $product;
-
-    // // Level 0 Basic info, no children
-    // $product = ["id" => $this->getId(),
-    //   "name" => $this->getName()];
-    // // Level 1, everything + children
-    // if ($level > 0){
-    //   $prod_query = new \ProductQuery();
-    //   $prod_parent = $prod_query->findPk($this->getParentId());
-    //   if($prod_parent) {
-    //     $product["parentId"] = $prod_parent->serialize($embedded_level);
-    //   }
-    //   else{
-    //     $product["parentId"] = null;
-    //   }
-    // }
   }
 
   public function unserialize ($data) {
     if (isset($data["name"])) $this->setName($data["name"]);
-    if (isset($data["parentId"])) $this->setParent($data["parentId"]);
+    if (isset($data["parentId"])) $this->changeParent($data["parentId"]);
   }
 
-// I do this check manually because even though the DB will reject
-// Inserts having an invalid foreign key, it will send back a generic error
-// such as: Unable to execute INSERT statement [INSERT INTO product
-// (parent_id, name, id, created_at, updated_at) VALUES (:p0, :p1, :p2, :p3, :p4)]
-  // public function setParent ($parentId) {
-  //   if(ProductQuery::create()
-  //   ->findPK($parentId)){
-  //     $this->setParentId($parentId);
-  //   }else{
-  //     throw new Exception("Parent does not exist");
-  //   }
-  //   $this->setParentId($parentId);
-  // }
+  // I do this check manually because even though the DB will reject
+  // Inserts having an invalid foreign key, it will send back a generic error
+  // such as: Unable to execute INSERT statement [INSERT INTO product
+  // (parent_id, name, id, created_at, updated_at) VALUES (:p0, :p1, :p2, :p3, :p4)]
+  public function changeParent ($parentId = null) {
+    $parent = ProductQuery::create()->findPK($parentId);
+    if ($parent) {
+      $this->insertAsLastChildOf($parent);
+    } else {
+      throw new Exception("Parent does not exist");
+    }
+  }
 
 }
