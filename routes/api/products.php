@@ -72,3 +72,35 @@ $app->delete('/api/products/{id}', function ($request, $response, $args) {
     $product
   );
 })->add('mwIsAdmin');
+
+// ==================================================
+// > POST /api/products/subscribe/{id}
+// ==================================================
+$app->post('/api/products/subscribe/{id}', function ($request, $response, $args) {
+  $user = auth\getUser($request);
+  $product = ProductQuery::create()->findPK($args['id']);
+  if ($product == null) return $response->withStatus(404);
+  try {
+    $product->addSubscriber($user);
+    $product->save();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
+  }
+})->add('mwIsLogged');
+
+// ==================================================
+// > POST /api/products/unsubscribe/{id}
+// ==================================================
+$app->post('/api/products/unsubscribe/{id}', function ($request, $response, $args) {
+  $user = auth\getUser($request);
+  $product = ProductQuery::create()->findPK($args['id']);
+  if ($product == null) return $response->withStatus(404);
+  try {
+    $product->removeSubscriber($user);
+    $product->save();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
+  }
+})->add('mwIsLogged');
