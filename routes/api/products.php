@@ -54,12 +54,10 @@ $app->post('/api/products/', function ($request, $response) {
 $app->put('/api/products/{id}', function ($request, $response, $args) {
   $product = ProductQuery::create()->findPK($args['id']);
   if ($product == null) return $response->withStatus(404);
-  try {
-    return api\update($request, $response, $product);
-  } catch (Exception $e) {
-    return $response->withStatus(400)
-    ->withJson(["Error = " => " " . $e->getMessage()]);
-  }
+  return api\update(
+    $request, $response,
+    $product
+  );
 })->add('mwIsAdmin');
 
 
@@ -69,12 +67,8 @@ $app->put('/api/products/{id}', function ($request, $response, $args) {
 $app->delete('/api/products/{id}', function ($request, $response, $args) {
   $product = ProductQuery::create()->findPK($args['id']);
   if ($product == null) return $response->withStatus(404);
-  try {
-    $product->delete();
-    return $response->withStatus(200);
-  } catch (Exception $e) {
-    return $response->withStatus(400)
-    ->withJson(["Error = " => " " . $e->getMessage() .
-     " Maybe the element to be deleted is a foreign key elsewhere."]);
-  }
+  return api\delete(
+    $request, $response,
+    $product
+  );
 })->add('mwIsAdmin');

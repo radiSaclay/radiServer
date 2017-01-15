@@ -27,13 +27,12 @@ $app->get('/api/farms/', function ($request, $response) {
 // > POST /api/farms/
 // ==================================================
 $app->post('/api/farms/', function ($request, $response) {
-  try {
-    $farm = new Farm();
-    $farm->setOwnerId(auth\getUser($request)->getId());
-    return api\update($request, $response, $farm);
-  } catch (Exception $e) {
-    return $response->withStatus(400);
-  }
+  $farm = new Farm();
+  $farm->setOwnerId(auth\getUser($request)->getId());
+  return api\update(
+    $request, $response,
+    $farm
+  );
 })->add('mwIsLogged');
 
 // ==================================================
@@ -45,11 +44,10 @@ $app->put('/api/farms/{id}', function ($request, $response, $args) {
   if ($farm->getOwnerId() != auth\getUser($request)->getId()) {
     return $response->withStatus(401);
   }
-  try {
-    return api\update($request, $response, $farm);
-  } catch (Exception $e) {
-    return $response->withStatus(400);
-  }
+  return api\update(
+    $request, $response,
+    $farm
+  );
 })->add('mwIsFarmer');
 
 
@@ -62,12 +60,10 @@ $app->delete('/api/farms/{id}', function ($request, $response, $args) {
   if ($farm->getOwnerId() != auth\getUser($request)->getId()) {
     return $response->withStatus(401);
   }
-  try {
-    $farm->delete();
-    return $response->withStatus(200);
-  } catch (Exception $e) {
-    return $response->withStatus(400);
-  }
+  return api\delete(
+    $request, $response,
+    $farm
+  );
 })->add('mwIsFarmer');
 
 // ==================================================

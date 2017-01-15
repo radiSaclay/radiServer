@@ -56,11 +56,10 @@ $app->put('/api/events/{id}', function ($request, $response, $args) {
   if ($event->getFarmId() != auth\getFarm($request)->getId()) {
     return $response->withStatus(401);
   }
-  try {
-    return api\update($request, $response, $event);
-  } catch (Exception $e) {
-    return $response->withStatus(400);
-  }
+  return api\update(
+    $request, $response,
+    $event
+  );
 })->add('mwIsFarmer');
 
 
@@ -73,12 +72,10 @@ $app->delete('/api/events/{id}', function ($request, $response, $args) {
   if ($event->getFarmId() != auth\getFarm($request)->getId()) {
     return $response->withStatus(401);
   }
-  try {
-    $event->delete();
-    return $response->withStatus(200);
-  } catch (Exception $e) {
-    return $response->withStatus(400);
-  }
+  return api\delete(
+    $request, $response,
+    $event
+  );
 })->add('mwIsFarmer');
 
 // ==================================================

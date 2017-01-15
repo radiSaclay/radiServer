@@ -64,3 +64,13 @@ function update ($request, $response, $item) {
     return $response->withJson([ "errors" => [$e->getMessage()] ], 400);
   }
 }
+
+function delete ($request, $response, $item) {
+  try {
+    $item->delete();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withJson([ "errors" => [$e->getMessage()] ], 400);
+  }
+
+}
