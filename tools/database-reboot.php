@@ -10,8 +10,8 @@ FarmProductQuery::create()->deleteAll();
 SubscriptionQuery::create()->deleteAll();
 PinQuery::create()->deleteAll();
 ProductQuery::create()->deleteAll();
-FarmQuery::create()->deleteAll();
 EventQuery::create()->deleteAll();
+FarmQuery::create()->deleteAll();
 UserQuery::create()->deleteAll();
 // OrderQuery::create()->deleteAll();
 
