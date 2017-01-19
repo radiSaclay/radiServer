@@ -11,10 +11,34 @@ It requires PHP 5.5+ and a database that can be configured in `./propel/propel.j
 - Clone that repository on your server
 - Install the dependencies using [composer](https://getcomposer.org/) by running `composer install` in you root directory.
 - Copy `./src/config.example.php` to `./src/config.php` and fill it with the proper values.
-- Copy `./propel/propel.example.json` to `./propel/propel.json.
+- Copy `./propel/propel.example.json` to `./propel/propel.json`.
 - Create a database and reference it in `./propel/propel.json` (see propel's documentation for more info.), then create the propel configuration file with `propel config:convert` in the `./propel` directory.
 - Migrate the database with propel command lines, `propel sql:build` and `propel sql:insert`.
 - Your server is now ready to go.
+
+## Usage
+
+#### Authentification
+[See docs](docs/routes/auth.md)
+
+#### REST API
+
+You can access a REST API for `farms`, `products` and `events`.
+
+##### Create `POST /api/XXXs/`
+
+##### Read `GET /api/XXXs/`
+This route will list all items. The result is paginated and you need to query with `offset` and `limit` arguments to get other pages.
+You can also set the level of details of the returned content with the `details` and  `embedded` arguments.
+
+##### Read `GET /api/XXXs/:id`
+This route will show the item which id is `:id`.
+You can also set the level of details of the returned content with the `details` and  `embedded` arguments.
+
+##### Update `PUT /api/XXXs/:id`
+##### Delete `DELETE /api/XXXs/:id`
+
+For more informations see [the detailled doc](docs/routes/api/).
 
 ## Routes
 
