@@ -13,7 +13,7 @@
 
     <behavior name="validate">
       <parameter name="emailNull" value="{ column: email, validator: NotNull }" />
-      <parameter name="emailUnique" value="{ column: email, validator: Unique } }" />
+      <parameter name="emailUnique" value="{ column: email, validator: Unique }" />
     </behavior>
   </table>
 
@@ -33,7 +33,7 @@
 
     <behavior name="validate">
       <parameter name="nameNull" value="{ column: name, validator: NotNull }" />
-      <parameter name="nameUnique" value="{ column: name, validator: Unique } }" />
+      <parameter name="nameUnique" value="{ column: name, validator: Unique }" />
     </behavior>
   </table>
 
@@ -66,7 +66,7 @@
 
     <behavior name="validate">
       <parameter name="titleNull" value="{ column: title, validator: NotNull }" />
-      <parameter name="titleUnique" value="{ column: title, validator: Unique } }" />
+      <parameter name="titleUnique" value="{ column: title, validator: Unique }" />
     </behavior>
   </table>
 

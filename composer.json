@@ -4,7 +4,8 @@
     "propel/propel": "~2.0@dev",
     "firebase/php-jwt": "^4.0",
     "vlucas/phpdotenv": "^2.4",
-    "fzaninotto/faker": "^1.6"
+    "fzaninotto/faker": "^1.6",
+    "guzzlehttp/guzzle": "^6.2"
   },
   "autoload": {
     "classmap": ["propel/generated-classes/"]
