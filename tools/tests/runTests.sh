@@ -1,5 +1,6 @@
 #!/bin/sh
 set -e
+TestOption=$1
 initial_dir=`pwd`
 ./setupTestDB.sh
 cd ../../
@@ -9,6 +10,6 @@ cd ../../src/tests/
 echo ""
 echo "Running tests..."
 echo ""
-phpunit .
+phpunit . $TestOption
 cd $initial_dir
 ./RevertToOriginalDB.sh

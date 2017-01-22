@@ -1,61 +1,31 @@
 <?php
 require_once '../../vendor/autoload.php';
 require_once '../../propel/generated-conf/config.php';
-use GuzzleHttp\Client;
+require_once 'AuthHelper.php';
+
 
 class authTest extends PHPUnit_Framework_TestCase
 {
-  protected $client;
   protected $email = 'TESTMAIL@gmail.com';
   protected $password = 'TESTPASS';
+  /**
+   * @var \PHPUnit_Framework_MockObject_MockObject|AuthHelper
+   */
+  protected $authHelper;
   protected function setUp()
   {
     parent::setUp();
-    // Create a client to talk to the server
-    $this->client = new Client([
-      // Base URI is used with relative requests
-      'base_uri' => 'http://127.0.0.1/auth/',
-      // You can set any number of default request options.
-      'timeout'  => 2.0,
-    ]);
+    $this->authHelper = new AuthHelper();
   }
-
-  public function testCreateAccount(){
-    $response = $this->client->request('POST', 'signup', ['json' => [
-      'email' => $this->email,
-      'password' => $this->password
-    ]]);
-    $response_arr = json_decode($response->getBody(), true);
-    self::assertEquals(true, $response_arr['validated']);
-    self::assertArrayHasKey('token', $response_arr);
-    return $response_arr['token'];
+  public function testAccountLifeCycle(){
+    $token = $this->authHelper->CreateAccount($this->email, $this->password);
+    $this->authHelper->GetAccount($token);
+    $this->authHelper->DeleteAccount($token);
+    $this->authHelper->Login($this->email, $this->password, false);
+    try {
+      $this->authHelper->GetAccount($token);
+    }catch (GuzzleHttp\Exception\ClientException $e){
+      self::assertEquals(404, $e->getResponse()->getStatusCode());
+    }
   }
-
-  /**
-   * @depends testCreateAccount
-   */
-  public function testLogin(){
-    $response = $this->client->request('POST', 'login', ['json' => [
-      'email' => $this->email,
-      'password' => $this->password
-    ]]);
-    $response_arr = json_decode($response->getBody(), true);
-    self::assertEquals(true, $response_arr['validated']);
-    self::assertArrayHasKey('token', $response_arr);
-    return $response_arr['token'];
-  }
-
-  /**
-   * @depends testLogin
-   */
-  public function testDeleteAccount($token){
-    $response = $this->client->request('DELETE', 'delete',[
-      'headers' => [
-        'Authorization' => $token
-      ]]);
-    echo $response->getBody();
-  }
-
-
-
 }
