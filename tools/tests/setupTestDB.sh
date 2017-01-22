@@ -2,8 +2,8 @@
 set -e
 
 initial_dir=`pwd`
-propel_dir=../../../propel
-test_propel_config_dir_from_propel_dir=../src/tests/config/
+propel_dir=../../propel
+test_propel_config_dir_from_propel_dir=../tools/tests/
 propel_bin_from_propel_dir=../vendor/bin/propel
 
 cd $propel_dir

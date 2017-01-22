@@ -2,7 +2,7 @@
 set -e
 
 initial_dir=`pwd`
-propel_dir=../../../propel
+propel_dir=../../propel
 propel_bin_from_propel_dir=../vendor/bin/propel
 
 cd $propel_dir
