@@ -1,6 +1,19 @@
 <?php
 
 // ==================================================
+// > GET /api/farms/subscribed
+// Returns the farms and also a flag "subscribed" when user is subscribed to a
+// farm
+// ==================================================
+$app->get('/api/products/subscribed', function ($request, $response) {
+  $user = auth\getUser($request);
+  return api\listCollection(
+    $request, $response,
+    ProductQuery::create()->filterBySubscriber($user)
+  );
+})->add('mwIsLogged');
+
+// ==================================================
 // > GET /api/products/{id}
 // Returns the product id
 // ==================================================

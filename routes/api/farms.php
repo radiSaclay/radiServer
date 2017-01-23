@@ -1,6 +1,19 @@
 <?php
 
 // ==================================================
+// > GET /api/farms/subscribed
+// Returns the farms and also a flag "subscribed" when user is subscribed to a
+// farm
+// ==================================================
+$app->get('/api/farms/subscribed', function ($request, $response) {
+  $user = auth\getUser($request);
+  return api\listCollection(
+    $request, $response,
+    FarmQuery::create()->filterBySubscriber($user)
+  );
+})->add('mwIsLogged');
+
+// ==================================================
 // > GET /api/farms/{id}
 // Just returns the given farm
 // ==================================================
