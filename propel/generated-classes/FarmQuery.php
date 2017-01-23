@@ -12,7 +12,15 @@ use Base\FarmQuery as BaseFarmQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class FarmQuery extends BaseFarmQuery
-{
+class FarmQuery extends BaseFarmQuery {
+
+  public function filterBySubscriber ($user) {
+    $list = SubscriptionQuery::create()
+      ->select('subscription_id')
+      ->filterByUserId($user->getId())
+      ->filterBySubscriptionType('farm')
+      ->find();
+    return $this->filterById($list->toArray());
+  }
 
 }
