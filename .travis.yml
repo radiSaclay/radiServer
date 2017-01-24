@@ -7,13 +7,6 @@ php:
   - '7.1'
   - hhvm
   - nightly
-install:
-  - cd propel
-  - ../vendor/bin/propel model:build
-  - ../vendor/bin/propel migration:diff
-  - ../vendor/bin/propel migration:migrate
-  - cd ..
-  - composer update
 script:
   - cd tools/tests
   - ./runTests.sh
