@@ -15,4 +15,6 @@ install:
   - cd ..
   - composer update
 script:
-  - 
+  - cd tools/tests
+  - ./runTests.sh
+  - cd ../..
