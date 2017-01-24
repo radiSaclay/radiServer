@@ -28,7 +28,7 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 });
 
 // > Load "./src" modules
-// All kind of usefull functions thematically sorted
+// All kind of useful functions thematically sorted
 require_once '../src/config.php';
 require_once '../src/collection.php';
 require_once '../src/jwt.php';
