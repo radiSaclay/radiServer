@@ -1,11 +1,11 @@
-| Field       | READ | WRITE |
-| :----       | :--- | :---- |
-| id*         | All  | None  |
-| name*       | All  | Admin |
-| parentId    | None | Admin |
-| farms**     | All  | None  |
-| children**  | All  | None  |
-| ancestors** | All  | None  |
+| Field         | READ | WRITE |
+| :----         | :--- | :---- |
+| id*           | All  | None  |
+| name*         | All  | Admin |
+| parentId      | None | Admin |
+| farms**       | All  | None  |
+| subproducts** | All  | None  |
+| ancestors**   | All  | None  |
 
 <small>
 _Fields marked with * will be seen even at lowest level of details_</br>

@@ -66,13 +66,13 @@ class Product extends BaseProduct {
       if ($embedded_level < 0) {
         $product["farms"] = \collection\getIds($this->getFarms());
         if ($this->isInTree()) {
-          $product["children"] = \collection\getIds($this->getChildren());
+          $product["subproducts"] = \collection\getIds($this->getChildren());
           $product["ancestors"] = \collection\getIds($this->getAncestors());
         }
       } else {
         $product["farms"] = \collection\serialize($this->getFarms(), $embedded_level);
         if ($this->isInTree()) {
-          $product["children"] = \collection\serialize($this->getChildren(), $embedded_level);
+          $product["subproducts"] = \collection\serialize($this->getChildren(), $embedded_level);
           $product["ancestors"] = \collection\serialize($this->getAncestors(), $embedded_level);
         }
       }
