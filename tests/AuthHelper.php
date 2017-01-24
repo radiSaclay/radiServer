@@ -1,6 +1,6 @@
 <?php
-require_once '../../vendor/autoload.php';
-require_once '../../propel/generated-conf/config.php';
+require_once '../vendor/autoload.php';
+require_once '../propel/generated-conf/config.php';
 use GuzzleHttp\Client;
 class AuthHelper
 {

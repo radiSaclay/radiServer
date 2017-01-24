@@ -6,7 +6,7 @@ initial_dir=`pwd`
 cd ../../
 php tools/database-reboot.php
 cd $initial_dir
-cd ../../src/tests/
+cd ../../tests/
 echo ""
 echo "Running tests..."
 echo ""
