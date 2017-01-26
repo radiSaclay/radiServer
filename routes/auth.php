@@ -3,7 +3,7 @@
 // ==================================================
 // > POST /auth/login
 // ==================================================
-function login ($request, $response) {
+$app->post('/auth/login', function ($request, $response) {
   $body = $request->getParsedBody();
   $user = UserQuery::create()->findOneByEmail($body["email"]);
   if ($user && password_verify($body["password"], $user->getPassword())) {
@@ -11,8 +11,7 @@ function login ($request, $response) {
   } else {
     return $response->withJson([ "validated" => false, "msg" => "Wrong credentials" ]);
   }
-}
-$app->post('/auth/login', 'login');
+});
 
 // ==================================================
 // > POST /auth/signup
