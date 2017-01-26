@@ -30,11 +30,12 @@ class Event extends BaseEvent {
         $event["pinned"] = $this->getUsers()->contains(auth\getUser($request));
       }
       // Embedded
+      $farm = $this->getFarm();
       if ($embedded_level < 0) {
-        $event["farmId"] = $this->getFarm()->getId();
+        $event["farmId"] = $farm ? $farm->getId() : null;
         $event["products"] = \collection\getIds($this->getProducts());
       } else {
-        $event["farm"] = $this->getFarm()->serialize($embedded_level);
+        $event["farm"] = $farm ? $farm->serialize($embedded_level) : null;
         $event["products"] = \collection\serialize($this->getProducts(), $embedded_level);
       }
     }
