@@ -53,7 +53,7 @@
   <!-- Event -->
   <table name="event" phpName="Event">
     <behavior name="auto_add_pk"/>
-    <column name="farm_id" type="integer" required="true"/>
+    <column name="farm_id" type="integer"/>
     <foreign-key foreignTable="farm">
       <reference local="farm_id" foreign="id"/>
     </foreign-key>
