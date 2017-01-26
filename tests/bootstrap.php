@@ -6,7 +6,6 @@ use PHPUnit\Framework\TestCase;
 use Slim\Http\Environment;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Slim\App;
 
 function makeRequest ($method, $path, $options = []) {
   // Capture STDOUT
