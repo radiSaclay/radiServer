@@ -12,6 +12,12 @@
     "classmap": ["propel/generated-classes/"]
   },
     "scripts": {
-      "test": "vendor/bin/phpunit tests -v --bootstrap tests/bootstrap.php"
+      "test": "vendor/bin/phpunit tests -v --bootstrap tests/bootstrap.php",
+      "propel:config": "cd propel && ../vendor/bin/propel config:convert",
+      "propel:model": "cd propel && ../vendor/bin/propel model:build",
+      "propel:diff": "cd propel && ../vendor/bin/propel migration:diff",
+      "propel:migrate": "cd propel && ../vendor/bin/propel migration:migrate",
+      "propel:schema": "composer propel:model && composer propel:diff && composer propel:migrate",
+      "propel:update": "composer propel:config && composer propel:schema"
     }
 }
