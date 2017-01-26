@@ -10,5 +10,8 @@
   },
   "autoload": {
     "classmap": ["propel/generated-classes/"]
-  }
+  },
+    "scripts": {
+      "test": "vendor/bin/phpunit tests -v --bootstrap tests/bootstrap.php"
+    }
 }
