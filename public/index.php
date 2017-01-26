@@ -37,10 +37,10 @@ require_once __DIR__ . '/../src/api.php';
 require_once __DIR__ . '/../src/middleware.php';
 
 // > load routes from "./routes"
-require_once __DIR__ . '/../routes/auth.php';
-require_once __DIR__ . '/../routes/api/farms.php';
-require_once __DIR__ . '/../routes/api/events.php';
-require_once __DIR__ . '/../routes/api/products.php';
+require __DIR__ . '/../routes/auth.php';
+require __DIR__ . '/../routes/api/farms.php';
+require __DIR__ . '/../routes/api/events.php';
+require __DIR__ . '/../routes/api/products.php';
 
 // > Wildcard
 // Will describe the path of all unregistered route.
