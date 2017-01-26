@@ -1,8 +1,8 @@
 <?php
 
 // Load dependecies
-require_once '../vendor/autoload.php';
-require_once '../propel/generated-conf/config.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../propel/generated-conf/config.php';
 
 // Use Slim classes
 use Slim\Http\Request;
@@ -29,18 +29,18 @@ $app->options('/{routes:.+}', function ($request, $response, $args) {
 
 // > Load "./src" modules
 // All kind of useful functions thematically sorted
-require_once '../src/config.php';
-require_once '../src/collection.php';
-require_once '../src/jwt.php';
-require_once '../src/auth.php';
-require_once '../src/api.php';
-require_once '../src/middleware.php';
+require_once __DIR__ . '/../src/config.php';
+require_once __DIR__ . '/../src/collection.php';
+require_once __DIR__ . '/../src/jwt.php';
+require_once __DIR__ . '/../src/auth.php';
+require_once __DIR__ . '/../src/api.php';
+require_once __DIR__ . '/../src/middleware.php';
 
 // > load routes from "./routes"
-require_once '../routes/auth.php';
-require_once '../routes/api/farms.php';
-require_once '../routes/api/events.php';
-require_once '../routes/api/products.php';
+require_once __DIR__ . '/../routes/auth.php';
+require_once __DIR__ . '/../routes/api/farms.php';
+require_once __DIR__ . '/../routes/api/events.php';
+require_once __DIR__ . '/../routes/api/products.php';
 
 // > Wildcard
 // Will describe the path of all unregistered route.
