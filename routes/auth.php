@@ -4,13 +4,7 @@
 // > POST /auth/login
 // ==================================================
 $app->post('/auth/login', function ($request, $response) {
-  $body = $request->getParsedBody();
-  $user = UserQuery::create()->findOneByEmail($body["email"]);
-  if ($user && password_verify($body["password"], $user->getPassword())) {
-    return $response->withJson([ "validated" => true, "token" => auth\createUserToken($user) ]);
-  } else {
-    return $response->withJson([ "validated" => false, "msg" => "Wrong credentials" ]);
-  }
+  return auth\login($request, $response);
 });
 
 // ==================================================
@@ -26,7 +20,7 @@ $app->post('/auth/signup', function ($request, $response) {
   } catch (Exception $e) {
     return $response->withJson([ "validated" => false, "msg" => "Could not sign up" ]);
   }
-  return login($request, $response);
+  return auth\login($request, $response);
 });
 
 // ==================================================

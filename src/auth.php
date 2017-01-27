@@ -1,5 +1,17 @@
 <?php namespace auth;
 
+function login ($request, $response) {
+  $body = $request->getParsedBody();
+  $user = \UserQuery::create()->findOneByEmail($body["email"]);
+  if ($user && password_verify($body["password"], $user->getPassword())) {
+    return $response->withJson([ "validated" => true, "token" => createUserToken($user) ]);
+  } else {
+    return $response->withJson([ "validated" => false, "msg" => "Wrong credentials" ]);
+  }
+}
+
+// ===
+
 function getUser ($request) {
   $token = \jwt\getToken($request);
   if ($token && isset($token["user_id"])) {
