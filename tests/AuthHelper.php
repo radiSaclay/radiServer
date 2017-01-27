@@ -1,6 +1,7 @@
 <?php
-require_once '../vendor/autoload.php';
-require_once '../propel/generated-conf/config.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../propel/generated-conf/config.php';
+require_once __DIR__ . '/bootstrap.php';
 use GuzzleHttp\Client;
 class AuthHelper
 {
@@ -11,20 +12,22 @@ class AuthHelper
   function __construct()
   {
     // Create a client to talk to the server
-    $this->client = new Client([
-      // Base URI is used with relative requests
-      'base_uri' => 'http://127.0.0.1/auth/',
-      // You can set any number of default request options.
-      'timeout'  => 2.0,
-    ]);
+//    $this->client = new Client([
+//      // Base URI is used with relative requests
+//      'base_uri' => 'http://127.0.0.1/auth/',
+//      // You can set any number of default request options.
+//      'timeout'  => 2.0,
+//    ]);
   }
 
   public function CreateAccount($email, $password){
-    $response = $this->client->request('POST', 'signup', ['json' => [
+    $response = makeRequest('POST', '/auth/signup', [
       'email' => $email,
       'password' => $password
-    ]]);
+    ]);
     $response_arr = json_decode($response->getBody(), true);
+    echo var_dump($response_arr);
+    echo $response->getStatusCode();
     PHPUnit_Framework_Assert::assertEquals(true, $response_arr['validated']);
     PHPUnit_Framework_Assert::assertArrayHasKey('token', $response_arr);
     $this->Login($email, $password);
@@ -32,10 +35,10 @@ class AuthHelper
   }
 
   public function Login($email, $password, $shouldExist = true){
-    $response = $this->client->request('POST', 'login', ['json' => [
+    $response = makeRequest('POST', '/auth/login', [
       'email' => $email,
       'password' => $password
-    ]]);
+    ]);
     $response_arr = json_decode($response->getBody(), true);
     if ($shouldExist) {
       PHPUnit_Framework_Assert::assertEquals(true, $response_arr['validated']);
@@ -50,18 +53,17 @@ class AuthHelper
 
 
   public function DeleteAccount($token){
-    $response = $this->client->request('DELETE', 'delete',[
-      'headers' => [
+    $response = makeRequest('DELETE', '/auth/delete',[
         'Authorization' => $token
-      ]]);
+      ]);
     PHPUnit_Framework_Assert::assertEquals(200 ,$response->getStatusCode());
   }
 
   public function GetAccount($token){
-    $response = $this->client->request('GET', 'user',[
-      'headers' => [
+    $response = makeRequest('GET', '/auth/user',[
+
         'Authorization' => $token
-      ]]);
+      ]);
     $response_arr = json_decode($response->getBody(), true);
     PHPUnit_Framework_Assert::assertEquals(200 ,$response->getStatusCode());
   }

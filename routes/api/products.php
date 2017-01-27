@@ -43,7 +43,7 @@ $app->post('/api/products/', function ($request, $response) {
     $request, $response,
     new Product()
   );
-})->add('mwIsAdmin');
+});
 
 // ==================================================
 // > PUT /api/products/ Update product

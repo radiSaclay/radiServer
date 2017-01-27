@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/src/setupDatabase.php';
 require_once __DIR__ . '/../vendor/autoload.php';
-
+use Slim\Http\RequestBody;
 use PHPUnit\Framework\TestCase;
 use Slim\Http\Environment;
 use Slim\Http\Request;
@@ -14,14 +14,16 @@ function makeRequest ($method, $path, $options = []) {
   $env = Environment::mock(array_merge([
     'REQUEST_METHOD' => $method,
     'REQUEST_URI' => $path,
+    'CONTENT_TYPE' => 'application/json;charset=utf8'
   ]), $options);
   // Load app
   require __DIR__ . '/../public/index.php';
   require __DIR__ . '/src/config.test.php';
   // clean STDOUT
   ob_get_clean();
-
-  $request = Request::createFromEnvironment($env);
+  $body = new RequestBody();
+  $body->write(json_encode($options));
+  $request = Request::createFromEnvironment($env)->withBody($body);
   return $app($request, new Response());
 }
 

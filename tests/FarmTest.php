@@ -1,7 +1,7 @@
 <?php
-require_once '../vendor/autoload.php';
-require_once '../propel/generated-conf/config.php';
-require_once 'FarmHelper.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../propel/generated-conf/config.php';
+require_once __DIR__ . '/FarmHelper.php';
 /**
  * Created by PhpStorm.
  * User: tiberio
