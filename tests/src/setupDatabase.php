@@ -42,6 +42,7 @@ function setupAll () {
   $db = setupDb($dirs);
   propelExec('migration:diff --schema-dir="'.$dirs['propel'].'"', $dirs['migration'], $db['dns']);
   propelExec('migration:migrate --config-dir="'.$dirs['propel'].'"', $dirs['migration'], $db['dns']);
+  require __DIR__ . '/config.test.php';
   return [
     'db' => $db,
     'dirs' => $dirs,
