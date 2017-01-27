@@ -2,23 +2,9 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../propel/generated-conf/config.php';
 require_once __DIR__ . '/bootstrap.php';
-use GuzzleHttp\Client;
+
 class AuthHelper
 {
-  /**
-   * @var \PHPUnit_Framework_MockObject_MockObject|Client
-   */
-  protected $client;
-  function __construct()
-  {
-    // Create a client to talk to the server
-//    $this->client = new Client([
-//      // Base URI is used with relative requests
-//      'base_uri' => 'http://127.0.0.1/auth/',
-//      // You can set any number of default request options.
-//      'timeout'  => 2.0,
-//    ]);
-  }
 
   public function CreateAccount($email, $password){
     $response = makeRequest('POST', '/auth/signup', [

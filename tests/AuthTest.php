@@ -4,7 +4,7 @@ require_once __DIR__ . '/../propel/generated-conf/config.php';
 require_once __DIR__ . '/AuthHelper.php';
 
 
-class authTest extends PHPUnit_Framework_TestCase
+class authTest extends ServerTestCase
 {
   protected $email = 'TESTMAI33L@gmail.com';
   protected $password = 'TESTPASS';
