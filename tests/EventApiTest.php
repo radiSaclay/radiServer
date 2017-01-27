@@ -16,12 +16,18 @@ final class EventApiTest extends ServerTestCase {
     $res = makeRequest('GET', '/api/events/');
     makeEvent('a', 'aaa');
     makeEvent('b', 'bbb');
-    $response = makeRequest('POST', '/api/products/', ['name' => 'This is ',
+    $response2 = makeRequest('POST', '/api/products/', ['name' => 'This is ',
       'parentId' => null
       ]);
+    $response = makeRequest('POST', '/auth/signup', ['email' => 'mymail',
+      'password' => 'adsd'
+    ]);
+
 
 
     echo "\n";
+    echo $response2->getBody();
+    echo $response2->getStatusCode();
     echo $response->getBody();
     echo $response->getStatusCode();
     echo $res->getBody();
