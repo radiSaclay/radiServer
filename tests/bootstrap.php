@@ -1,29 +1,34 @@
 <?php
 require_once __DIR__ . '/src/setupDatabase.php';
 require_once __DIR__ . '/../vendor/autoload.php';
-use Slim\Http\RequestBody;
+
 use PHPUnit\Framework\TestCase;
 use Slim\Http\Environment;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Slim\Http\RequestBody;
 
-function makeRequest ($method, $path, $options = []) {
+function makeRequest ($method, $path, $body = null, $options = []) {
   // Capture STDOUT
   ob_start();
   // Prepare a mock environment
   $env = Environment::mock(array_merge([
     'REQUEST_METHOD' => $method,
     'REQUEST_URI' => $path,
-    'CONTENT_TYPE' => 'application/json;charset=utf8'
+    'CONTENT_TYPE' => 'application/json;charset=utf8',
   ]), $options);
   // Load app
   require __DIR__ . '/../public/index.php';
   require __DIR__ . '/src/config.test.php';
   // clean STDOUT
   ob_get_clean();
-  $body = new RequestBody();
-  $body->write(json_encode($options));
-  $request = Request::createFromEnvironment($env)->withBody($body);
+
+  $request = Request::createFromEnvironment($env);
+  if ($body !== null) {
+    $reqbody = new RequestBody();
+    $reqbody->write(json_encode($body));
+    $request = $request->withBody($reqbody);
+  }
   return $app($request, new Response());
 }
 
