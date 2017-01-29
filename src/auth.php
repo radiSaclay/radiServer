@@ -4,9 +4,9 @@ function login ($request, $response) {
   $body = $request->getParsedBody();
   $user = \UserQuery::create()->findOneByEmail($body["email"]);
   if ($user && password_verify($body["password"], $user->getPassword())) {
-    return $response->withJson([ "validated" => true, "token" => createUserToken($user) ]);
+    return $response->withJson(["token" => createUserToken($user)]);
   } else {
-    return $response->withJson([ "validated" => false, "msg" => "Wrong credentials" ]);
+    return $response->withJson(["msg" => "Wrong credentials" ], 401);
   }
 }
 
