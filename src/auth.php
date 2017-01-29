@@ -6,7 +6,7 @@ function login ($request, $response) {
   if ($user && password_verify($body["password"], $user->getPassword())) {
     return $response->withJson([ "validated" => true, "token" => createUserToken($user) ]);
   } else {
-    return $response->withJson([ "validated" => false, "msg" => "Wrong credentials" ]);
+    return $response->withJson([ "validated" => false, "msg" => "Wrong credentials" ], 401);
   }
 }
 
