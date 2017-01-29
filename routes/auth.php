@@ -18,7 +18,7 @@ $app->post('/auth/signup', function ($request, $response) {
     $user->setPassword(password_hash($data["password"], PASSWORD_DEFAULT));
     $user->save();
   } catch (Exception $e) {
-    return $response->withJson([ "validated" => false, "msg" => "Could not sign up" . $e->getMessage() ]);
+    return $response->withJson([ "validated" => false, "msg" => "Could not sign up"]);
   }
   return auth\login($request, $response);
 });

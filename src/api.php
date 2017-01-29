@@ -50,7 +50,6 @@ function view ($request, $response, $item, $callback = '\api\nullFunction') {
 }
 
 function update ($request, $response, $item) {
-  var_dump($request->getParsedBody());
   try {
     $item->unserialize($request->getParsedBody());
     if (!$item->validate()) {
