@@ -1,7 +1,7 @@
 <?php
-require_once '../vendor/autoload.php';
-require_once '../propel/generated-conf/config.php';
-require_once 'ProductHelper.php';
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../propel/generated-conf/config.php';
+require_once __DIR__ . '/ProductHelper.php';
 
 class ProductTest extends PHPUnit_Framework_TestCase
 {

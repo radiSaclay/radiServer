@@ -13,7 +13,7 @@ function setupDir () {
   mkdir('temp');
   mkdir('temp/migration');
   return [
-    'propel' => realpath(getcwd().'/propel'),
+    'propel' => getcwd().'/../propel',
     'temp' => realpath(getcwd().'/temp'),
     'migration' => realpath(getcwd().'/temp/migration'),
   ];
@@ -30,7 +30,7 @@ function setupDb ($dirs) {
 }
 
 function propelExec ($command, $output, $dns) {
-  $cmd = './vendor/bin/propel '.$command;
+  $cmd = __DIR__ . '/../../vendor/bin/propel '.$command;
   $cmd .= ' --output-dir="'.$output.'"';
   $cmd .= ' --connection="default='.$dns.'"';
   // echo $cmd . "\n\n";
