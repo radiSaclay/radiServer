@@ -54,9 +54,11 @@ $container = $app->getContainer();
 $container['errorHandler'] = function ($container) {
   return function ($request, $response, $error) use ($container) {
     // Format of exception to return
-    return $container['response']->withJson([
-      'message' => $error->getMessage()
-    ], 500);
+    if ($error->getMessage() == 'Expired token') {
+      return $container['response']->withJson([ 'message' => $error->getMessage() ], 401);
+    } else {
+      return $container['response']->withJson([ 'message' => $error->getMessage() ], 500);
+    }
   };
 };
 
