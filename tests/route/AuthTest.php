@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../tools/seeder.php';
+require_once 'tools/seeder.php';
 
 final class RouteAuthTest extends ServerTestCase {
 
