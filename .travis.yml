@@ -7,7 +7,7 @@ php:
   - nightly
 install: composer install
 before_script:
+  - cp src/config.example.php src/config.php
   - cp propel/propel.example.json propel/propel.json
   - composer propel:config
-  - touch propel/generated-conf/config.php
 script: phpunit -c tests/phpunit.xml
