@@ -3,7 +3,7 @@
 use PHPUnit\Framework\TestCase;
 require_once 'tools/seeder.php';
 
-final class SeederTest extends TestCase {
+final class SeederTest extends ServerTestCase {
 
   // = USERS ===
 
@@ -103,28 +103,30 @@ final class SeederTest extends TestCase {
   //   $this->assertEquals($product->getName(), $name);
   // }
 
-  // public function testMakeProduct () {
-  //   $faker = Faker\Factory::create();
-  //   $name = $faker->word;
-  //
-  //   $id = seeder\makeRootProduct($name)->getId();
-  //   $product = \ProductQuery::create()->findPK($id);
-  //
-  //   $this->assertTrue($product != null);
-  //   $this->assertEquals($product->getName(), $name);
-  // }
+  public function testMakeProduct () {
+    $faker = Faker\Factory::create();
+    $name = $faker->word;
+
+    $id = seeder\makeRootProduct($name)->getId();
+    $product = \ProductQuery::create()->findPK($id);
+
+    $this->assertTrue($product != null);
+    $this->assertEquals($product->getName(), $name);
+  }
 
   // = EVENTS ===
 
-  // public function testMakeEvent ($title, $content, $farm = null, $products = []) {
-  //   $event = new \Event();
-  //   $event->setTitle($title);
-  //   $event->setDescription($content);
-  //   if ($farm) $event->setFarm($farm);
-  //   foreach ($products as $product)
-  //     $event->addProduct($product);
-  //   $event->save();
-  //   return $event;
-  // }
+  public function testMakeEvent () {
+    $faker = Faker\Factory::create();
+    $title = $faker->sentence;
+    $content = $faker->paragraph;
+
+    $id = seeder\makeEvent ($title, $content)->getId();
+    $event = \EventQuery::create()->findPK($id);
+
+    $this->assertTrue($event != null);
+    $this->assertEquals($event->getTitle(), $title);
+    $this->assertEquals($event->getDescription(), $content);
+  }
 
 }
