@@ -49,10 +49,11 @@ function makeRootProduct ($name) {
   return $root;
 }
 
-function makeProduct ($name, $parentId) {
+function makeProduct ($name, $parentId = null) {
   $root = new \Product();
   $root->setName($name);
-  $this->changeParent($parentId);
+  if ($parentId)
+    $this->changeParent($parentId);
   $root->save();
   return $root;
 }
