@@ -8,6 +8,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\RequestBody;
 
+$_SERVER["SERVER_ADDR"] = '123';
 function makeRequest ($method, $path, $body = null, $options = []) {
   // Capture STDOUT
   ob_start();
