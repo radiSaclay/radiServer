@@ -21,7 +21,7 @@ function makeUser ($email, $password) {
   return $user;
 }
 
-function makeFarmer ($email, $password, $farmName, $farmData) {
+function makeFarmer ($email, $password, $farmName, $farmData = []) {
   $farmer = makeUser($email, $password);
   $farm = new \Farm($farmer, $farmName, $farmData);
   $farmer->save();
@@ -30,7 +30,7 @@ function makeFarmer ($email, $password, $farmName, $farmData) {
 
 // = FARMS ===
 
-function makeFarm ($owner, $name, $data) {
+function makeFarm ($owner, $name, $data = []) {
   $farm = new \Farm();
   $farm->setName($name);
   $farm->unserialize($data);
