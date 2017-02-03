@@ -17,7 +17,7 @@ function makeRequest ($method, $path, $body = null, $options = []) {
     'REQUEST_METHOD' => $method,
     'REQUEST_URI' => $path,
     'CONTENT_TYPE' => 'application/json;charset=utf8',
-  ]), $options);
+  ], $options));
   // Load app
   require __DIR__ . '/../public/index.php';
   require __DIR__ . '/src/config.test.php';
