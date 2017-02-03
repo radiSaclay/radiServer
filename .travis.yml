@@ -7,4 +7,5 @@ php:
   - '7.1'
   - hhvm
   - nightly
-script: composer test
+install: composer install
+script: phpunit tests -v --bootstrap tests/bootstrap.php
