@@ -3,10 +3,6 @@
 // > Load JWT library
 use \Firebase\JWT\JWT;
 
-// > Load the JWT key
-// "JWTKEY" from the "./.env" file
-$jwtkey = CONFIG["JWTKEY"];
-
 // ==================================================
 // > createToken
 // --------------------------------------------------
@@ -15,7 +11,6 @@ $jwtkey = CONFIG["JWTKEY"];
 // attributes that will be useful for checking.
 // ==================================================
 function createToken ($payload, $lifespan = 0) {
-  global $jwtkey;
   $now = time();
   return JWT::encode(array_merge(
     $payload, [
@@ -24,7 +19,7 @@ function createToken ($payload, $lifespan = 0) {
       "exp" => $now + $lifespan, // expire at
       "iss" => $_SERVER["SERVER_ADDR"] // issuer
     ]
-  ), $jwtkey);
+  ), CONFIG["JWTKEY"]);
 }
 
 // ==================================================
@@ -49,9 +44,8 @@ function getAuthJWT ($request) {
 // as an array.
 // ==================================================
 function decodeToken ($jwt) {
-  global $jwtkey;
   try {
-    $token = JWT::decode($jwt, $jwtkey, array("HS256"));
+    $token = JWT::decode($jwt, CONFIG["JWTKEY"], array("HS256"));
     return (array) $token;
   } catch (Exception $e) {
     return null;
