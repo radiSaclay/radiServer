@@ -21,13 +21,6 @@ function makeUser ($email, $password) {
   return $user;
 }
 
-function makeFarmer ($email, $password, $farmName, $farmData = []) {
-  $farmer = makeUser($email, $password);
-  $farm = new \Farm($farmer, $farmName, $farmData);
-  $farmer->save();
-  return $farmer;
-}
-
 // = FARMS ===
 
 function makeFarm ($owner, $name, $data = []) {

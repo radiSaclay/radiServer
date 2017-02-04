@@ -59,9 +59,10 @@ final class RouteApiFarmTest extends ServerTestCase {
 
   public function testRouteGetFarms () {
     $faker = Faker\Factory::create();
-    for ($i = 0; $i < 10; $i++)
-      seeder\makeFarmer($faker->email, $faker->word, $faker->word);
-
+    for ($i = 0; $i < 10; $i++) {
+      $user = seeder\makeUser($faker->email, $faker->word);
+      $farm = seeder\makeFarm($user, $faker->word, $this->randFarmData());
+    }
     $res = makeRequest('GET', '/api/farms/');
     $this->assertEquals($res->getStatusCode(), 200);
   }

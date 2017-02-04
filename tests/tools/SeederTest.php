@@ -34,34 +34,6 @@ final class SeederTest extends ServerTestCase {
     $this->assertTrue(password_verify($password, $user->getPassword()));
   }
 
-  public function testMakeFarmer () {
-    $faker = Faker\Factory::create();
-    $email = $faker->email;
-    $password = $faker->word;
-    $farmName = $faker->word;
-    $farmData = [
-      'address' => $faker->address,
-      'website' => $faker->url,
-      'phone' => $faker->e164PhoneNumber,
-      'email' => $faker->email,
-    ];
-
-    $id = seeder\makeFarmer($email, $password, $farmName, $farmData)->getId();
-    $user = \UserQuery::create()->findPK($id);
-
-    $this->assertTrue($user != null);
-    $this->assertEquals($user->getEmail(), $email);
-    $this->assertTrue(password_verify($password, $user->getPassword()));
-
-    // $farm = $user->getFarms()->getFirst();
-    // $this->assertTrue($farm != null);
-    // $this->assertEquals($farm->getName(), $farmName);
-    // $this->assertEquals($farm->getAddress(), $farmData['address']);
-    // $this->assertEquals($farm->getWebsite(), $farmData['website']);
-    // $this->assertEquals($farm->getPhone(), $farmData['phone']);
-    // $this->assertEquals($farm->getEmail(), $farmData['email']);
-  }
-
   // = FARMS ===
 
   public function testMakeFarm () {
@@ -91,23 +63,23 @@ final class SeederTest extends ServerTestCase {
 
   // = PRODUCTS ===
 
-  // public function testMakeRootProduct () {
-  //   $faker = Faker\Factory::create();
-  //   $name = $faker->word;
-  //
-  //   $id = seeder\makeRootProduct($name)->getId();
-  //   $product = \ProductQuery::create()->findPK($id);
-  //
-  //   $this->assertTrue($product != null);
-  //   $this->assertTrue($product->isRoot());
-  //   $this->assertEquals($product->getName(), $name);
-  // }
+  public function testMakeRootProduct () {
+    $faker = Faker\Factory::create();
+    $name = $faker->word;
+
+    $id = seeder\makeRootProduct($name)->getId();
+    $product = \ProductQuery::create()->findPK($id);
+
+    $this->assertTrue($product != null);
+    $this->assertTrue($product->isRoot());
+    $this->assertEquals($product->getName(), $name);
+  }
 
   public function testMakeProduct () {
     $faker = Faker\Factory::create();
     $name = $faker->word;
 
-    $id = seeder\makeRootProduct($name)->getId();
+    $id = seeder\makeProduct($name)->getId();
     $product = \ProductQuery::create()->findPK($id);
 
     $this->assertTrue($product != null);
