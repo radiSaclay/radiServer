@@ -12,27 +12,6 @@ final class RouteApiProductTest extends ServerTestCase {
     return auth\createUserToken($admin);
   }
 
-  // public function randProductData () {
-  //   $faker = Faker\Factory::create();
-  //   return [
-  //     'name' => $faker->word,
-  //     'address' => $faker->address,
-  //     'website' => $faker->url,
-  //     'phone' => $faker->e164PhoneNumber,
-  //     'email' => $faker->email,
-  //   ];
-  // }
-  //
-  // public function checkProduct ($product, $productData) {
-  //   $this->assertEquals($product->getName(), $productData['name']);
-  //   $this->assertEquals($product->getAddress(), $productData['address']);
-  //   $this->assertEquals($product->getWebsite(), $productData['website']);
-  //   $this->assertEquals($product->getPhone(), $productData['phone']);
-  //   $this->assertEquals($product->getEmail(), $productData['email']);
-  //   if (isset($productData['id']))
-  //     $this->assertEquals($product->getId(), $productData['id']);
-  // }
-
   // = Tests ===
 
   public function testRoutePostProduct () {
