@@ -68,6 +68,6 @@ function eventData () {
   ];
 }
 
-function makeEvent () {
-  return \seeder\makeEvent(eventData());
+function makeEvent ($farm = null) {
+  return \seeder\makeEvent(eventData(), $farm);
 }
