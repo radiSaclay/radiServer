@@ -53,9 +53,11 @@ function makeProduct ($data = []) {
 
 // = EVENTS ===
 
-function makeEvent ($data = []) {
+function makeEvent ($data = [], $farm = null) {
   $event = new \Event();
   $event->unserialize($data);
+  if ($farm)
+    $event->setFarm($farm);
   $event->save();
   return $event;
 }

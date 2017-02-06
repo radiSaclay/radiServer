@@ -90,4 +90,16 @@ final class SeederTest extends ServerTestCase {
     // $this->assertEquals($event->getEndAt('U'), $data['endAt']);
   }
 
+  public function testMakeEventWithFarm () {
+    $farm = faker\makeFarm(faker\makeUser());
+    $data = faker\eventData();
+
+    $id = seeder\makeEvent($data, $farm)->getId();
+    $event = \EventQuery::create()->findPK($id);
+
+    $this->assertTrue($event != null);
+    $this->assertEquals($event->getfarm()->getId(), $farm->getId());
+
+  }
+
 }
