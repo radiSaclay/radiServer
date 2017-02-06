@@ -8,7 +8,18 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use Slim\Http\RequestBody;
 
-$_SERVER["SERVER_ADDR"] = '123';
+function clearDatabase () {
+  EventProductQuery::create()->deleteAll();
+  FarmProductQuery::create()->deleteAll();
+  SubscriptionQuery::create()->deleteAll();
+  PinQuery::create()->deleteAll();
+  ProductQuery::create()->deleteAll();
+  EventQuery::create()->deleteAll();
+  FarmQuery::create()->deleteAll();
+  UserQuery::create()->deleteAll();
+}
+
+$_SERVER["SERVER_ADDR"] = 'radiserver.dev';
 function makeRequest ($method, $path, $body = null, $options = []) {
   // Capture STDOUT
   ob_start();
@@ -39,6 +50,11 @@ class ServerTestCase extends TestCase {
 
   public static function setUpBeforeClass () {
     self::$settings = setupAll();
+  }
+
+  public function tearDown () {
+    require __DIR__ . '/src/config.test.php';
+    clearDatabase();
   }
 
   public static function tearDownAfterClass () {
