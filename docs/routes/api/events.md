@@ -2,7 +2,6 @@
 | :----         | :---   | :---- |
 | id*           | All    | None  |
 | title*        | All    | Owner |
-| productId     | All    | Owner |
 | description   | All    | Owner |
 | publishAt     | All    | Owner |
 | beginAt       | All    | Owner |
