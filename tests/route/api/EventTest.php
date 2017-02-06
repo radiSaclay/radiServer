@@ -54,29 +54,34 @@ final class RouteApiEventTest extends ServerTestCase {
     $this->assertEquals($res->getStatusCode(), 200);
   }
 
-  // public function testRouteUpdateEvent () {
-  //   $faker = Faker\Factory::create();
-  //   $user = seeder\makeUser($faker->email, $faker->word);
-  //   $event = seeder\makeEvent($user, $faker->word, faker\eventData());
-  //   $token = auth\createUserToken($user);
-  //   $eventData = faker\eventData();
-  //
-  //   $res = makeRequest('PUT', '/api/events/' . $event->getId(), $eventData, ['HTTP_AUTHORIZATION' => $token]);
-  //   $this->assertEquals($res->getStatusCode(), 200);
-  //
-  //   $this->checkEvent($event, $eventData);
-  // }
+  public function testRouteUpdateEvent () {
+    $user = faker\makeUser();
+    $farm = faker\makeFarm($user);
+    $token = auth\createUserToken($user);
+    $event = faker\makeEvent($farm);
+    $eventData = faker\eventData();
 
-  // public function testRouteDeleteEvent () {
-  //   $faker = Faker\Factory::create();
-  //   $user = seeder\makeUser($faker->email, $faker->word);
-  //   $event = seeder\makeEvent($user, $faker->word, faker\eventData());
-  //   $token = auth\createUserToken($user);
-  //
-  //   $res = makeRequest('DELETE', '/api/events/' . $event->getId(), null, ['HTTP_AUTHORIZATION' => $token]);
-  //   $this->assertEquals($res->getStatusCode(), 200);
-  //
-  //   $this->assertEquals(EventQuery::create()->findPK($event->getId()), null);
-  // }
+    $res = makeRequest(
+      'PUT', '/api/events/' . $event->getId(), $eventData,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+    $this->checkEvent($event, $eventData);
+  }
+
+  public function testRouteDeleteEvent () {
+    $user = faker\makeUser();
+    $farm = faker\makeFarm($user);
+    $token = auth\createUserToken($user);
+    $event = faker\makeEvent($farm);
+
+    $res = makeRequest(
+      'DELETE', '/api/events/' . $event->getId(), null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+
+    $this->assertEquals($res->getStatusCode(), 200);
+    $this->assertEquals(EventQuery::create()->findPK($event->getId()), null);
+  }
 
 }
