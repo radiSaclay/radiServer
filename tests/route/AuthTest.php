@@ -1,13 +1,13 @@
 <?php
 
 require_once 'tools/seeder.php';
+require_once 'tools/faker.php';
 
 final class RouteAuthTest extends ServerTestCase {
 
   public function testSignup () {
-    $faker = Faker\Factory::create();
-    $email = $faker->email;
-    $password = $faker->word;
+    $email = faker\email();
+    $password = faker\word();
 
     $res = makeRequest('POST', '/auth/signup', [
       "email" => $email,
@@ -26,9 +26,8 @@ final class RouteAuthTest extends ServerTestCase {
   }
 
   public function testLogin () {
-    $faker = Faker\Factory::create();
-    $email = $faker->email;
-    $password = $faker->word;
+    $email = faker\email();
+    $password = faker\word();
     $user = seeder\makeUser($email, $password);
 
     $res = makeRequest('POST', '/auth/login', [
@@ -44,9 +43,8 @@ final class RouteAuthTest extends ServerTestCase {
   }
 
   public function testGetUser () {
-    $faker = Faker\Factory::create();
-    $email = $faker->email;
-    $password = $faker->word;
+    $email = faker\email();
+    $password = faker\word();
     $user = seeder\makeUser($email, $password);
     $token = auth\createUserToken($user);
 
