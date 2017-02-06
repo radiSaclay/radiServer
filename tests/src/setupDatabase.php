@@ -10,8 +10,10 @@ function rmdir_recursive ($dir) {
 }
 
 function setupDir () {
-  mkdir('temp');
-  mkdir('temp/migration');
+  if (!is_dir('temp')) {
+    mkdir('temp');
+    mkdir('temp/migration');
+  }
   return [
     'propel' => realpath(getcwd().'/propel'),
     'temp' => realpath(getcwd().'/temp'),
@@ -51,5 +53,5 @@ function setupAll () {
 
 function clearAll ($settings) {
   $settings['db']['db']->close();
-  // rmdir_recursive('temp');
+  rmdir_recursive('temp');
 }
