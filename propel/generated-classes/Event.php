@@ -43,8 +43,7 @@ class Event extends BaseEvent {
   }
 
   public function unserialize ($data) {
-    if (isset($data["productId"])) $this->setProductId($data["productId"]);
-    if (isset($data["name"])) $this->setDescription($data["name"]);
+    if (isset($data["title"])) $this->setTitle($data["title"]);
     if (isset($data["description"])) $this->setDescription($data["description"]);
     if (isset($data["publishAt"])) $this->setPublishAt($data["publishAt"]);
     if (isset($data["beginAt"])) $this->setBeginAt($data["beginAt"]);
