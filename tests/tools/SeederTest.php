@@ -99,7 +99,6 @@ final class SeederTest extends ServerTestCase {
 
     $this->assertTrue($event != null);
     $this->assertEquals($event->getfarm()->getId(), $farm->getId());
-
   }
 
 }
