@@ -2,15 +2,15 @@
 
 use PHPUnit\Framework\TestCase;
 require_once 'tools/seeder.php';
+require_once 'tools/faker.php';
 
 final class SeederTest extends ServerTestCase {
 
   // = USERS ===
 
   public function testMakeAdmin () {
-    $faker = Faker\Factory::create();
-    $email = $faker->email;
-    $password = $faker->word;
+    $email = faker\email();
+    $password = faker\word();
 
     $id = seeder\makeAdmin($email, $password)->getId();
     $user = \UserQuery::create()->findPK($id);
@@ -22,9 +22,8 @@ final class SeederTest extends ServerTestCase {
   }
 
   public function testMakeUser () {
-    $faker = Faker\Factory::create();
-    $email = $faker->email;
-    $password = $faker->word;
+    $email = faker\email();
+    $password = faker\word();
 
     $id = seeder\makeUser($email, $password)->getId();
     $user = \UserQuery::create()->findPK($id);
@@ -37,23 +36,14 @@ final class SeederTest extends ServerTestCase {
   // = FARMS ===
 
   public function testMakeFarm () {
-    $faker = Faker\Factory::create();
-    $ownerEmail = $faker->email;
-    $ownerPassword = $faker->word;
-    $name = $faker->word;
-    $data = [
-      'address' => $faker->address,
-      'website' => $faker->url,
-      'phone' => $faker->e164PhoneNumber,
-      'email' => $faker->email,
-    ];
+    $data = faker\farmData();
+    $owner = faker\makeUser();
 
-    $owner = seeder\makeUser($ownerEmail, $ownerPassword);
-    $id = seeder\makeFarm($owner, $name, $data)->getId();
+    $id = seeder\makeFarm($owner, $data)->getId();
     $farm = \FarmQuery::create()->findPK($id);
 
     $this->assertTrue($farm != null);
-    $this->assertEquals($farm->getName(), $name);
+    $this->assertEquals($farm->getName(), $data['name']);
     $this->assertEquals($farm->getAddress(), $data['address']);
     $this->assertEquals($farm->getWebsite(), $data['website']);
     $this->assertEquals($farm->getPhone(), $data['phone']);
@@ -64,41 +54,40 @@ final class SeederTest extends ServerTestCase {
   // = PRODUCTS ===
 
   public function testMakeRootProduct () {
-    $faker = Faker\Factory::create();
-    $name = $faker->word;
+    $data = faker\productData();
 
-    $id = seeder\makeRootProduct($name)->getId();
+    $id = seeder\makeRootProduct($data)->getId();
     $product = \ProductQuery::create()->findPK($id);
 
     $this->assertTrue($product != null);
     $this->assertTrue($product->isRoot());
-    $this->assertEquals($product->getName(), $name);
+    $this->assertEquals($product->getName(), $data['name']);
   }
 
   public function testMakeProduct () {
-    $faker = Faker\Factory::create();
-    $name = $faker->word;
+    $data = faker\productData();
 
-    $id = seeder\makeProduct($name)->getId();
+    $id = seeder\makeProduct($data)->getId();
     $product = \ProductQuery::create()->findPK($id);
 
     $this->assertTrue($product != null);
-    $this->assertEquals($product->getName(), $name);
+    $this->assertEquals($product->getName(), $data['name']);
   }
 
   // = EVENTS ===
 
   public function testMakeEvent () {
-    $faker = Faker\Factory::create();
-    $title = $faker->sentence;
-    $content = $faker->paragraph;
+    $data = faker\eventData();
 
-    $id = seeder\makeEvent ($title, $content)->getId();
+    $id = seeder\makeEvent($data)->getId();
     $event = \EventQuery::create()->findPK($id);
 
     $this->assertTrue($event != null);
-    $this->assertEquals($event->getTitle(), $title);
-    $this->assertEquals($event->getDescription(), $content);
+    $this->assertEquals($event->getTitle(), $data['title']);
+    $this->assertEquals($event->getDescription(), $data['description']);
+    // $this->assertEquals($event->getPublishAt('U'), $data['publishAt']);
+    // $this->assertEquals($event->getBeginAt('U'), $data['beginAt']);
+    // $this->assertEquals($event->getEndAt('U'), $data['endAt']);
   }
 
 }
