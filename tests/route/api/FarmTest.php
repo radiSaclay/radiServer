@@ -1,21 +1,11 @@
 <?php
 
 require_once 'tools/seeder.php';
+require_once 'tools/faker.php';
 
 final class RouteApiFarmTest extends ServerTestCase {
 
   // = Helpers ===
-
-  public function randFarmData () {
-    $faker = Faker\Factory::create();
-    return [
-      'name' => $faker->word,
-      'address' => $faker->address,
-      'website' => $faker->url,
-      'phone' => $faker->e164PhoneNumber,
-      'email' => $faker->email,
-    ];
-  }
 
   public function checkFarm ($farm, $farmData) {
     $this->assertEquals($farm->getName(), $farmData['name']);
@@ -30,12 +20,14 @@ final class RouteApiFarmTest extends ServerTestCase {
   // = Tests ===
 
   public function testRoutePostFarm () {
-    $faker = Faker\Factory::create();
-    $user = seeder\makeUser($faker->email, $faker->word);
+    $user = faker\makeUser();
     $token = auth\createUserToken($user);
-    $farmData = $this->randFarmData();
+    $farmData = faker\farmData();
 
-    $res = makeRequest('POST', '/api/farms/', $farmData, ['HTTP_AUTHORIZATION' => $token]);
+    $res = makeRequest(
+      'POST', '/api/farms/', $farmData,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
     $this->assertEquals($res->getStatusCode(), 200);
 
     $farm = auth\getUserFarm($user);
@@ -45,10 +37,9 @@ final class RouteApiFarmTest extends ServerTestCase {
 
   public function testRouteGetFarmById () {
     $faker = Faker\Factory::create();
-    $farmData = $this->randFarmData();
-    $name = $farmData['name'];
-    $user = seeder\makeUser($faker->email, $faker->word);
-    $farm = seeder\makeFarm($user, $name, $farmData);
+    $farmData = faker\farmData();
+    $user = faker\makeUser();
+    $farm = seeder\makeFarm($user, $farmData);
 
     $res = makeRequest('GET', '/api/farms/' . $farm->getId());
     $this->assertEquals($res->getStatusCode(), 200);
@@ -58,37 +49,36 @@ final class RouteApiFarmTest extends ServerTestCase {
   }
 
   public function testRouteGetFarms () {
-    $faker = Faker\Factory::create();
-    for ($i = 0; $i < 10; $i++) {
-      $user = seeder\makeUser($faker->email, $faker->word);
-      $farm = seeder\makeFarm($user, $faker->word, $this->randFarmData());
-    }
+    for ($i = 0; $i < 10; $i++)
+      faker\makeFarm(faker\makeUser());
     $res = makeRequest('GET', '/api/farms/');
     $this->assertEquals($res->getStatusCode(), 200);
   }
 
   public function testRouteUpdateFarm () {
-    $faker = Faker\Factory::create();
-    $user = seeder\makeUser($faker->email, $faker->word);
-    $farm = seeder\makeFarm($user, $faker->word, $this->randFarmData());
+    $user = faker\makeUser();
+    $farm = faker\makeFarm($user);
     $token = auth\createUserToken($user);
-    $farmData = $this->randFarmData();
+    $farmData = faker\farmData();
 
-    $res = makeRequest('PUT', '/api/farms/' . $farm->getId(), $farmData, ['HTTP_AUTHORIZATION' => $token]);
+    $res = makeRequest(
+      'PUT', '/api/farms/' . $farm->getId(), $farmData,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
     $this->assertEquals($res->getStatusCode(), 200);
-
     $this->checkFarm($farm, $farmData);
   }
 
   public function testRouteDeleteFarm () {
-    $faker = Faker\Factory::create();
-    $user = seeder\makeUser($faker->email, $faker->word);
-    $farm = seeder\makeFarm($user, $faker->word, $this->randFarmData());
+    $user = faker\makeUser();
+    $farm = faker\makeFarm($user);
     $token = auth\createUserToken($user);
 
-    $res = makeRequest('DELETE', '/api/farms/' . $farm->getId(), null, ['HTTP_AUTHORIZATION' => $token]);
+    $res = makeRequest(
+      'DELETE', '/api/farms/' . $farm->getId(), null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
     $this->assertEquals($res->getStatusCode(), 200);
-
     $this->assertEquals(FarmQuery::create()->findPK($farm->getId()), null);
   }
 

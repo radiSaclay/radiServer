@@ -1,72 +1,72 @@
 <?php
 
 require_once 'tools/seeder.php';
+require_once 'tools/faker.php';
 
 final class RouteApiProductTest extends ServerTestCase {
 
   // = Helpers ===
 
   public function getAdminToken () {
-    $faker = Faker\Factory::create();
-    $admin = seeder\makeAdmin($faker->email, $faker->word);
+    $admin = faker\makeAdmin();
     return auth\createUserToken($admin);
+  }
+
+  public function checkProduct ($product, $productData) {
+    $this->assertEquals($product->getName(), $productData['name']);
+    if (isset($productData['id']))
+      $this->assertEquals($product->getId(), $productData['id']);
   }
 
   // = Tests ===
 
   public function testRoutePostProduct () {
-    $faker = Faker\Factory::create();
-    $name = $faker->word;
+    $data = faker\productData();
 
     $res = makeRequest(
-      'POST', '/api/products/',
-      ['name' => $name],
+      'POST', '/api/products/', $data,
       ['HTTP_AUTHORIZATION' => $this->getAdminToken()]
     );
     $this->assertEquals($res->getStatusCode(), 200);
 
-    $product = ProductQuery::create()->filterByName($name)->findOne();
+    $product = ProductQuery::create()->filterByName($data['name'])->findOne();
     $this->assertTrue($product != null);
+    $this->checkProduct($product, $data);
   }
 
   public function testRouteGetProductById () {
-    $faker = Faker\Factory::create();
-    $name = $faker->word;
-    $product = seeder\makeProduct($name);
+    $data = faker\productData();
+    $product = seeder\makeProduct($data);
 
     $res = makeRequest('GET', '/api/products/' . $product->getId());
     $this->assertEquals($res->getStatusCode(), 200);
 
     $body = json_decode($res->getBody(), true);
-    $this->assertEquals($name, $body['name']);
+    $this->checkProduct($product, $body);
   }
 
   public function testRouteGetProducts () {
-    $faker = Faker\Factory::create();
     for ($i = 0; $i < 10; $i++)
-      seeder\makeProduct($faker->word);
+      faker\makeProduct();
 
     $res = makeRequest('GET', '/api/products/');
     $this->assertEquals($res->getStatusCode(), 200);
   }
 
   public function testRouteUpdateProduct () {
-    $faker = Faker\Factory::create();
-    $product = seeder\makeProduct($faker->word);
-    $name = $faker->word;
+    $product = faker\makeProduct();
+    $data = faker\productData();
 
     $res = makeRequest(
-      'PUT', '/api/products/' . $product->getId(),
-      ['name' => $name],
+      'PUT', '/api/products/' . $product->getId(), $data,
       ['HTTP_AUTHORIZATION' => $this->getAdminToken()]
     );
     $this->assertEquals($res->getStatusCode(), 200);
-    $this->assertEquals($name, $product->getName());
+    $this->checkProduct($product, $data);
   }
 
   public function testRouteDeleteProduct () {
-    $faker = Faker\Factory::create();
-    $product = seeder\makeProduct($faker->word);
+    $product = faker\makeProduct();
 
     $res = makeRequest(
       'DELETE', '/api/products/' . $product->getId(), null,
