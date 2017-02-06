@@ -23,43 +23,39 @@ function makeUser ($email, $password) {
 
 // = FARMS ===
 
-function makeFarm ($owner, $name, $data = []) {
+function makeFarm ($owner, $data = []) {
   $farm = new \Farm();
-  $farm->setName($name);
-  $farm->unserialize($data);
   $farm->setUser($owner);
+  $farm->unserialize($data);
   $farm->save();
   return $farm;
 }
 
 // = PRODUCTS ===
 
-function makeRootProduct ($name) {
-  $root = new \Product();
-  $root->setName($name);
-  $root->makeRoot();
+function makeRootProduct ($data = []) {
+  $root = \ProductQuery::create()->findRoot();
+  if ($root == null) {
+    $root = new \Product();
+    $root->makeRoot();
+  }
+  $root->unserialize($data);
   $root->save();
   return $root;
 }
 
-function makeProduct ($name, $parentId = null) {
-  $root = new \Product();
-  $root->setName($name);
-  if ($parentId)
-    $this->changeParent($parentId);
-  $root->save();
-  return $root;
+function makeProduct ($data = []) {
+  $product = new \Product();
+  $product->unserialize($data);
+  $product->save();
+  return $product;
 }
 
 // = EVENTS ===
 
-function makeEvent ($title, $content, $farm = null, $products = []) {
+function makeEvent ($data = []) {
   $event = new \Event();
-  $event->setTitle($title);
-  $event->setDescription($content);
-  if ($farm) $event->setFarm($farm);
-  foreach ($products as $product)
-    $event->addProduct($product);
+  $event->unserialize($data);
   $event->save();
   return $event;
 }

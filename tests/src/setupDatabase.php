@@ -51,5 +51,5 @@ function setupAll () {
 
 function clearAll ($settings) {
   $settings['db']['db']->close();
-  rmdir_recursive('temp');
+  // rmdir_recursive('temp');
 }
