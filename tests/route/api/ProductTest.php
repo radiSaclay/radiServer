@@ -76,4 +76,33 @@ final class RouteApiProductTest extends ServerTestCase {
     $this->assertEquals(ProductQuery::create()->findPK($product->getId()), null);
   }
 
+  public function testRouteSubscribeFarm () {
+    $product = faker\makeProduct();
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $res = makeRequest(
+      'POST', '/api/products/subscribe/' . $product->getId(), null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+    $this->assertTrue($product->hasSubscriber($user));
+  }
+
+  public function testRouteUnsubscribeFarm () {
+    $product = faker\makeProduct();
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $product->addSubscriber($user);
+    $this->assertTrue($product->hasSubscriber($user));
+
+    $res = makeRequest(
+      'POST', '/api/products/unsubscribe/' . $product->getId(), null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+    $this->assertFalse($product->hasSubscriber($user));
+  }
+
 }

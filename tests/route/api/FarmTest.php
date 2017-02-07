@@ -82,4 +82,33 @@ final class RouteApiFarmTest extends ServerTestCase {
     $this->assertEquals(FarmQuery::create()->findPK($farm->getId()), null);
   }
 
+  public function testRouteSubscribeFarm () {
+    $farm = faker\makeFarm(faker\makeUser());
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $res = makeRequest(
+      'POST', '/api/farms/subscribe/' . $farm->getId(), null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+    $this->assertTrue($farm->hasSubscriber($user));
+  }
+
+  public function testRouteUnsubscribeFarm () {
+    $farm = faker\makeFarm(faker\makeUser());
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $farm->addSubscriber($user);
+    $this->assertTrue($farm->hasSubscriber($user));
+
+    $res = makeRequest(
+      'POST', '/api/farms/unsubscribe/' . $farm->getId(), null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+    $this->assertFalse($farm->hasSubscriber($user));
+  }
+
 }
