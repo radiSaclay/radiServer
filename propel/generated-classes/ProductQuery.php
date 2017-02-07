@@ -12,7 +12,14 @@ use Base\ProductQuery as BaseProductQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ProductQuery extends BaseProductQuery
-{
+class ProductQuery extends BaseProductQuery {
 
+  public function filterBySubscriber ($user) {
+    $list = SubscriptionQuery::create()
+      ->select('subscription_id')
+      ->filterByUserId($user->getId())
+      ->filterBySubscriptionType('product')
+      ->find();
+    return $this->filterById($list->toArray());
+  }
 }

@@ -4,7 +4,7 @@
       "connections": {
         "default": {
           "adapter": "mysql",
-          "dsn": "mysql:host=127.0.0.1;port=3306;dbname=radisaclay",
+          "dsn": "mysql:host=127.0.0.1;port=3306;dbname=radisaclaytest",
           "user": "root",
           "password": null,
           "settings": { "charset": "utf8" }

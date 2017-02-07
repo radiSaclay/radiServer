@@ -1,11 +1,7 @@
-<?php namespace auth;
+<?php namespace jwt;
 
 // > Load JWT library
 use \Firebase\JWT\JWT;
-
-// > Load the JWT key
-// "JWTKEY" from the "./.env" file
-$jwtkey = $_ENV["JWTKEY"];
 
 // ==================================================
 // > createToken
@@ -15,7 +11,6 @@ $jwtkey = $_ENV["JWTKEY"];
 // attributes that will be useful for checking.
 // ==================================================
 function createToken ($payload, $lifespan = 0) {
-  global $jwtkey;
   $now = time();
   return JWT::encode(array_merge(
     $payload, [
@@ -24,14 +19,14 @@ function createToken ($payload, $lifespan = 0) {
       "exp" => $now + $lifespan, // expire at
       "iss" => $_SERVER["SERVER_ADDR"] // issuer
     ]
-  ), $jwtkey);
+  ), CONFIG["JWTKEY"]);
 }
 
 // ==================================================
 // > getAuthJWT
 // --------------------------------------------------
 //   Returns the jwt string contained in the given
-// request"s header under "Authorization". Returns
+// request's header under "Authorization". Returns
 // null if there is not.
 // ==================================================
 function getAuthJWT ($request) {
@@ -49,8 +44,12 @@ function getAuthJWT ($request) {
 // as an array.
 // ==================================================
 function decodeToken ($jwt) {
-  global $jwtkey;
-  return (array) JWT::decode($jwt, $jwtkey, array("HS256"));
+  try {
+    $token = JWT::decode($jwt, CONFIG["JWTKEY"], array("HS256"));
+    return (array) $token;
+  } catch (Exception $e) {
+    return null;
+  }
 }
 
 // ==================================================
@@ -78,7 +77,7 @@ function getToken ($request) {
   $jwt = getAuthJWT($request);
   if ($jwt != null) {
     $token = decodeToken($jwt);
-    if (checkToken($token)) {
+    if ($token && checkToken($token)) {
       return $token;
     }
   }

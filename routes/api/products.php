@@ -1,64 +1,103 @@
 <?php
 
-// Gets a single prodcut using its primary key
+// ==================================================
+// > GET /api/farms/subscribed
+// Returns the farms and also a flag "subscribed" when user is subscribed to a
+// farm
+// ==================================================
+$app->get('/api/products/subscribed', function ($request, $response) {
+  $user = auth\getUser($request);
+  return api\listCollection(
+    $request, $response,
+    ProductQuery::create()->filterBySubscriber($user)
+  );
+})->add('mwIsLogged');
+
+// ==================================================
+// > GET /api/products/{id}
+// Returns the product id
+// ==================================================
 $app->get('/api/products/{id}', function ($request, $response, $args) {
-    $prods = new ProductQuery();
-    $prods_arr = $prods->findPK($args['id']);
-    if($prods_arr === null){
-      return $response->withStatus(404);
-    }
-    $prods_arr = $prods_arr->toArray();
-    return $response->withJson($prods_arr, 200);
-  }
-);
+  return api\view(
+    $request, $response,
+    ProductQuery::create()->findPK($args['id'])
+  );
+});
 
-// Returns all products
+// ==================================================
+// > GET /api/products/
+// Returns all the products
+// ==================================================
 $app->get('/api/products/', function ($request, $response) {
-    $prods = ProductQuery::create()->find()->toArray();
-    return $response->withJson($prods, 200);
-  }
-);
+  return api\listCollection(
+    $request, $response,
+    ProductQuery::create()
+  );
+});
 
-// Creates new product
-// The new product name is received in $request which should be a json file
-// having a key 'name' with value corresponding to the name of the new product
+// ==================================================
+// > POST /api/products/ Create product
+// ==================================================
 $app->post('/api/products/', function ($request, $response) {
-    $new_prod = new Product();
-    $parsedBody = $request->getParsedBody();
-    if($parsedBody['name'] === null){
-      return $response->withStatus(400);
-    }
-    $new_prod->setName($parsedBody['name']);
-    $new_prod->save();
-    return $response->withJson($new_prod->toArray(), 201); // Object created
-  }
-);
+  return api\update(
+    $request, $response,
+    new Product()
+  );
+})->add('mwIsAdmin');
 
-// Updates the product
-// The product to be updated is the one with id = id and its new name
-// is passed inside the $request json file (value of the ket 'new_name')
+// ==================================================
+// > PUT /api/products/ Update product
+// ==================================================
 $app->put('/api/products/{id}', function ($request, $response, $args) {
-    $parsedBody = $request->getParsedBody();
-    if(!array_key_exists('new_name', $parsedBody)){
-      return $response->withStatus(400);
-    }
-    $to_update = ProductQuery::create()->findPK($args['id']);
-    if($to_update === null){
-      return $response->withStatus(404);
-    }
-    $to_update->setName($parsedBody['new_name']);
-    $to_update->save();
-    return $response->withStatus(200); // No errors // OK
-  }
-);
+  $product = ProductQuery::create()->findPK($args['id']);
+  if ($product == null) return $response->withStatus(404);
+  return api\update(
+    $request, $response,
+    $product
+  );
+})->add('mwIsAdmin');
 
-// Deletes the product with id id
+
+// ==================================================
+// > DELETE /api/products/{id}
+// ==================================================
 $app->delete('/api/products/{id}', function ($request, $response, $args) {
-    $to_delete = ProductQuery::create()->findPK($args['id']);
-    if($to_delete === null){
-      return $response->withStatus(404);
-    }
-    $to_delete->delete();
-    return $response->withStatus(200); // No errors // OK
+  $product = ProductQuery::create()->findPK($args['id']);
+  if ($product == null) return $response->withStatus(404);
+  return api\delete(
+    $request, $response,
+    $product
+  );
+})->add('mwIsAdmin');
+
+// ==================================================
+// > POST /api/products/subscribe/{id}
+// ==================================================
+$app->post('/api/products/subscribe/{id}', function ($request, $response, $args) {
+  $user = auth\getUser($request);
+  $product = ProductQuery::create()->findPK($args['id']);
+  if ($product == null) return $response->withStatus(404);
+  try {
+    $product->addSubscriber($user);
+    $product->save();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
   }
-);
+})->add('mwIsLogged');
+
+// ==================================================
+// > POST /api/products/unsubscribe/{id}
+// ==================================================
+$app->post('/api/products/unsubscribe/{id}', function ($request, $response, $args) {
+  $user = auth\getUser($request);
+  $product = ProductQuery::create()->findPK($args['id']);
+  if ($product == null) return $response->withStatus(404);
+  try {
+    $product->removeSubscriber($user);
+    $product->save();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withStatus(400);
+  }
+})->add('mwIsLogged');

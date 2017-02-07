@@ -1,55 +1,76 @@
 <?php namespace api;
+use Exception;
 
-require_once 'classes.php';
+// = Helpers ===
+function nullFunction ($item) {}
 
-// ==================================================
-//  > Resource
-// ==================================================
-function resource ($table) {
-  return function ($req, $res, $args) use ($table) {
-    $method = $req->getMethod();
-    $id = isset($args['id']) ? $args['id'] : null;
-    $result = array('status' => 404, 'data' => []);
+function getCollection ($request, $query) {
+  $offset = $request->getParam('offset');
+  $limit = $request->getParam('limit');
+  if ($limit == null || $limit > CONFIG["MAX_LIMIT"]) {
+    $limit = CONFIG["MAX_LIMIT"];
+  }
+  return $query->paginate($offset, $limit);
+}
 
-    if ($id == null) {
-      if ($method == 'GET') $result = getAll($table);
-      if ($method == 'POST') $result = create($table, $req);
-    } else {
-      if ($method == 'GET') $result = getById($table, $id);
-      if ($method == 'PUT') $result = edit($table, $id, $req);
-      // if ($method == 'DELETE') $result = destroy($table, $id);
+function getParams ($request) {
+  $level = $request->getParam('details');
+  $level = ($level != null) ? intval($level) : 1;
+  $embedded_level = $request->getParam('embedded') ? 0 : -1;
+  return [
+    "level" => $level,
+    "embedded_level" => $embedded_level,
+  ];
+}
+
+function serializeItem ($item, $callback, $level, $embedded_level, $request) {
+  $base_data = $item->serialize($level, $embedded_level, $request);
+  $more_data = $callback($item);
+  return $more_data
+    ? array_merge($base_data, $more_data)
+    : $base_data;
+}
+
+// = CRUD ===
+function listCollection ($request, $response, $query, $callback = '\api\nullFunction') {
+  $params = getParams($request);
+  $data = \collection\map(
+    getCollection($request, $query),
+    function ($item) use ($params, $callback, $request) {
+      return serializeItem($item, $callback, $params["level"], $params["embedded_level"], $request);
     }
-
-    return $res
-      ->withStatus($result['status'])
-      ->withJson($result['data']);
-  };
+  );
+  return $response->withJson($data, 200);
 }
 
-function getAll ($table) {
-  return array('status' => 200, 'data' => \query($table)->find()->toArray());
+function view ($request, $response, $item, $callback = '\api\nullFunction') {
+  if (!$item) return $response->withStatus(404);
+  $data = serializeItem($item, $callback, 2, 0, $request);
+  return $response->withJson($data, 200);
 }
 
-function create ($table, $req) {
-  $item = \instanciate($table);
-  $item->fromArray($req->getParsedBody());
-  $item->save();
-  return array('status' => 200, 'data' => $item->toArray());
-}
-
-function getById ($table, $id) {
-  if ($item = \query($table)->findPK($id)) {
-    return array('status' => 200, 'data' => $item->toArray());
-  } else {
-    return array('status' => 404, 'data' => null);
+function update ($request, $response, $item) {
+  try {
+    $item->unserialize($request->getParsedBody());
+    if (!$item->validate()) {
+      $errors = [];
+      foreach ($item->getValidationFailures() as $failure)
+        $errors[] = "Property ".$failure->getPropertyPath().": ".$failure->getMessage()."\n";
+      return $response->withJson([ "errors" => $errors ], 400);
+    }
+    $item->save();
+    return $response->withJson($item->serialize(), 200);
+  } catch (Exception $e) {
+    return $response->withJson([ "errors" => [$e->getMessage()] ], 400);
   }
 }
 
-function edit ($table, $id, $req) {
-  if ($item = \query($table)->findPK($id)) {
-    $item->update($req->getParsedBody());
-    return array('status' => 200, 'data' => $item->toArray());
-  } else {
-    return array('status' => 404, 'data' => null);
+function delete ($request, $response, $item) {
+  try {
+    $item->delete();
+    return $response->withStatus(200);
+  } catch (Exception $e) {
+    return $response->withJson([ "errors" => [$e->getMessage()] ], 400);
   }
+
 }

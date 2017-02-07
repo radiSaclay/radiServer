@@ -6,16 +6,27 @@
 //  - All middleware are variables with the "mw"
 // prefix.
 
-// ==================================================
-// > Check Logged
-// --------------------------------------------------
-//   Middleware that check if the user is logged.
-// Returns 401 status for guests.
-// ==================================================
-$mwCheckLogged = function ($req, $res, $next) {
-  if (auth\isLogged($req)) {
-    return $next($req, $res);
+function mwIsLogged ($request, $response, $next) {
+  $token = jwt\getToken($request);
+  if ($token) {
+    return $next($request, $response);
   } else {
-    return $res->withStatus(401);
+    return $response->withStatus(401);
+  }
+};
+
+function mwIsFarmer ($request, $response, $next) {
+  if (\auth\isFarmer($request)) {
+    return $next($request, $response);
+  } else {
+    return $response->withStatus(401);
+  }
+};
+
+function mwIsAdmin ($request, $response, $next) {
+  if (\auth\isAdmin($request)) {
+    return $next($request, $response);
+  } else {
+    return $response->withStatus(401);
   }
 };

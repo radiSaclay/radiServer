@@ -3,9 +3,21 @@
     "slim/slim": "^3.0",
     "propel/propel": "~2.0@dev",
     "firebase/php-jwt": "^4.0",
-    "vlucas/phpdotenv": "^2.4"
+    "vlucas/phpdotenv": "^2.4",
+    "fzaninotto/faker": "^1.6",
+    "guzzlehttp/guzzle": "^6.2",
+    "phpunit/phpunit": "^5.7"
   },
   "autoload": {
     "classmap": ["propel/generated-classes/"]
-  }
+  },
+    "scripts": {
+      "test": "rm -rf temp && vendor/bin/phpunit tests -v --bootstrap tests/bootstrap.php",
+      "propel:config": "cd propel && ../vendor/bin/propel config:convert",
+      "propel:model": "cd propel && ../vendor/bin/propel model:build",
+      "propel:diff": "cd propel && ../vendor/bin/propel migration:diff",
+      "propel:migrate": "cd propel && ../vendor/bin/propel migration:migrate",
+      "propel:schema": "composer propel:model && composer propel:diff && composer propel:migrate",
+      "propel:update": "composer propel:config && composer propel:schema"
+    }
 }
