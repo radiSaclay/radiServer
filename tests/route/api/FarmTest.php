@@ -111,4 +111,28 @@ final class RouteApiFarmTest extends ServerTestCase {
     $this->assertFalse($farm->hasSubscriber($user));
   }
 
+  public function testRouteGetSubscribedFarms () {
+    $farm1 = faker\makeFarm(faker\makeUser());
+    $farm2 = faker\makeFarm(faker\makeUser());
+    $farm3 = faker\makeFarm(faker\makeUser());
+
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $farm2->addSubscriber($user);
+    $this->assertTrue($farm2->hasSubscriber($user));
+
+    $res = makeRequest(
+      'GET', '/api/farms/subscribed', null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+
+    $body = json_decode($res->getBody(), true);
+    $list = array_map(function ($farm) { return $farm['id']; }, $body);
+    $this->assertNotContains($farm1->getId(), $list);
+    $this->assertContains($farm2->getId(), $list);
+    $this->assertNotContains($farm3->getId(), $list);
+  }
+
 }
