@@ -22,9 +22,9 @@ class Event extends BaseEvent {
     // Level 1
     if ($level >= 1) {
       $event["description"] = $this->getDescription();
-      $event["publishAt"] = $this->getPublishAt();
-      $event["BeginAt"] = $this->getBeginAt();
-      $event["EndAt"] = $this->getEndAt();
+      $event["publishAt"] = $this->getPublishAt('U');
+      $event["beginAt"] = $this->getBeginAt('U');
+      $event["endAt"] = $this->getEndAt('U');
       $farm["pins"] = $this->countUsers();
       if ($request && auth\isUser($request)) {
         $event["pinned"] = $this->getUsers()->contains(auth\getUser($request));
@@ -45,9 +45,9 @@ class Event extends BaseEvent {
   public function unserialize ($data) {
     if (isset($data["title"])) $this->setTitle($data["title"]);
     if (isset($data["description"])) $this->setDescription($data["description"]);
-    if (isset($data["publishAt"])) $this->setPublishAt($data["publishAt"]);
-    if (isset($data["beginAt"])) $this->setBeginAt($data["beginAt"]);
-    if (isset($data["endAt"])) $this->setEndAt($data["endAt"]);
+    if (isset($data["publishAt"])) $this->setPublishAt(new DateTime('@'.$data["publishAt"]));
+    if (isset($data["beginAt"])) $this->setBeginAt(new DateTime('@'.$data["beginAt"]));
+    if (isset($data["endAt"])) $this->setEndAt(new DateTime('@'.$data["endAt"]));
   }
 
 }
