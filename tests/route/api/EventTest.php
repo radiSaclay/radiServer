@@ -85,4 +85,20 @@ final class RouteApiEventTest extends ServerTestCase {
     $this->assertEquals(EventQuery::create()->findPK($event->getId()), null);
   }
 
+  public function testRouteGetEventsByFarmId () {
+    $farm = faker\makeFarm(faker\makeUser());
+    $event1 = faker\makeEvent($farm);
+    $event2 = faker\makeEvent(faker\makeFarm(faker\makeUser()));
+    $event3 = faker\makeEvent();
+
+    $res = makeRequest('GET', '/api/events/?farmId=' . $farm->getId());
+    $this->assertEquals($res->getStatusCode(), 200);
+
+    $body = json_decode($res->getBody(), true);
+    $list = array_map(function ($event) { return $event['id']; }, $body);
+    $this->assertContains($event1->getId(), $list);
+    $this->assertNotContains($event2->getId(), $list);
+    $this->assertNotContains($event3->getId(), $list);
+  }
+
 }
