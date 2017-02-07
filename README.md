@@ -1,4 +1,5 @@
 # RadiServer
+![build status](https://travis-ci.org/radiSaclay/radiServer.svg?branch=master)
 
 > The server for radiSaclay's project. Exposes a REST API to be used by mobile apps.
 
