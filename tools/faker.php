@@ -62,9 +62,9 @@ function eventData () {
   return [
     'title' => $faker->word,
     'description' => $faker->sentence,
-    // 'publishAt' => $faker->unixTime,
-    // 'beginAt' => $faker->unixTime,
-    // 'endAt' => $faker->unixTime,
+    'publishAt' => $faker->unixTime,
+    'beginAt' => $faker->unixTime,
+    'endAt' => $faker->unixTime,
   ];
 }
 

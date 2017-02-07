@@ -8,11 +8,12 @@ final class RouteApiEventTest extends ServerTestCase {
   // = Helpers ===
 
   public function checkEvent ($event, $eventData) {
+    // var_dump($eventData);
     $this->assertEquals($event->getTitle(), $eventData['title']);
     $this->assertEquals($event->getDescription(), $eventData['description']);
-    // $this->assertEquals($event->getPublishAt('U'), $eventData['publishAt']);
-    // $this->assertEquals($event->getBeginAt('U'), $eventData['beginAt']);
-    // $this->assertEquals($event->getEndAt('U'), $eventData['endAt']);
+    $this->assertEquals($event->getPublishAt('U'), $eventData['publishAt']);
+    $this->assertEquals($event->getBeginAt('U'), $eventData['beginAt']);
+    $this->assertEquals($event->getEndAt('U'), $eventData['endAt']);
     if (isset($eventData['id']))
       $this->assertEquals($event->getId(), $eventData['id']);
   }
