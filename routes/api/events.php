@@ -21,8 +21,18 @@ $app->get('/api/events/{id}', function ($request, $response, $args) {
 $app->get('/api/events/', function ($request, $response) {
   $events = EventQuery::create();
   // Filtering
-  $farmId = $request->getParam('farmId');
-  if ($farmId) $events = $events->filterByFarmId($farmId);
+  // - by Farm
+  if ($request->getParam('farmId')) {
+    $events = $events->filterByFarmId($request->getParam('farmId'));
+  }
+  // - by Subscribed
+  if ($request->getParam('subscribed')) {
+    $user = auth\getUser($request);
+    if ($user == null)
+      return $response->withStatus(401);
+    $events = $events->filterBySubscriber($user);
+  }
+  // Show list
   return api\listCollection(
     $request, $response,
     $events

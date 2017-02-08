@@ -82,4 +82,57 @@ final class RouteApiFarmTest extends ServerTestCase {
     $this->assertEquals(FarmQuery::create()->findPK($farm->getId()), null);
   }
 
+  public function testRouteSubscribeFarm () {
+    $farm = faker\makeFarm(faker\makeUser());
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $res = makeRequest(
+      'POST', '/api/farms/subscribe/' . $farm->getId(), null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+    $this->assertTrue($farm->hasSubscriber($user));
+  }
+
+  public function testRouteUnsubscribeFarm () {
+    $farm = faker\makeFarm(faker\makeUser());
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $farm->addSubscriber($user);
+    $this->assertTrue($farm->hasSubscriber($user));
+
+    $res = makeRequest(
+      'POST', '/api/farms/unsubscribe/' . $farm->getId(), null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+    $this->assertFalse($farm->hasSubscriber($user));
+  }
+
+  public function testRouteGetSubscribedFarms () {
+    $farm1 = faker\makeFarm(faker\makeUser());
+    $farm2 = faker\makeFarm(faker\makeUser());
+    $farm3 = faker\makeFarm(faker\makeUser());
+
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $farm2->addSubscriber($user);
+    $this->assertTrue($farm2->hasSubscriber($user));
+
+    $res = makeRequest(
+      'GET', '/api/farms/subscribed', null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+
+    $body = json_decode($res->getBody(), true);
+    $list = array_map(function ($farm) { return $farm['id']; }, $body);
+    $this->assertNotContains($farm1->getId(), $list);
+    $this->assertContains($farm2->getId(), $list);
+    $this->assertNotContains($farm3->getId(), $list);
+  }
+
 }

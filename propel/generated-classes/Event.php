@@ -14,7 +14,11 @@ use Base\Event as BaseEvent;
  */
 class Event extends BaseEvent {
 
-    public function serialize ($level = 1, $embedded_level = -1, $request = null) {
+  public function hasProduct ($product) {
+    return $this->getProducts()->contains($product);
+  }
+
+  public function serialize ($level = 1, $embedded_level = -1, $request = null) {
     $event = [];
     // Level 0
     $event["id"] = $this->getId();
@@ -48,6 +52,16 @@ class Event extends BaseEvent {
     if (isset($data["publishAt"])) $this->setPublishAt(new DateTime('@'.$data["publishAt"]));
     if (isset($data["beginAt"])) $this->setBeginAt(new DateTime('@'.$data["beginAt"]));
     if (isset($data["endAt"])) $this->setEndAt(new DateTime('@'.$data["endAt"]));
+    if (isset($data["products"])) $this->resetProducts($data["products"]);
+  }
+
+  public function resetProducts ($productIds) {
+    foreach ($this->getProducts() as $product) {
+      $this->removeProduct($product);
+    }
+    foreach ($productIds as $id) {
+      $this->addProduct(ProductQuery::create()->findPk($id));
+    }
   }
 
 }

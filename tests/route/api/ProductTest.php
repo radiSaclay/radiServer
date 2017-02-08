@@ -76,4 +76,57 @@ final class RouteApiProductTest extends ServerTestCase {
     $this->assertEquals(ProductQuery::create()->findPK($product->getId()), null);
   }
 
+  public function testRouteSubscribeProduct () {
+    $product = faker\makeProduct();
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $res = makeRequest(
+      'POST', '/api/products/subscribe/' . $product->getId(), null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+    $this->assertTrue($product->hasSubscriber($user));
+  }
+
+  public function testRouteUnsubscribeProduct () {
+    $product = faker\makeProduct();
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $product->addSubscriber($user);
+    $this->assertTrue($product->hasSubscriber($user));
+
+    $res = makeRequest(
+      'POST', '/api/products/unsubscribe/' . $product->getId(), null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+    $this->assertFalse($product->hasSubscriber($user));
+  }
+
+  public function testRouteGetSubscribedProducts () {
+    $product1 = faker\makeProduct();
+    $product2 = faker\makeProduct();
+    $product3 = faker\makeProduct();
+
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $product2->addSubscriber($user);
+    $this->assertTrue($product2->hasSubscriber($user));
+
+    $res = makeRequest(
+      'GET', '/api/products/subscribed', null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+
+    $body = json_decode($res->getBody(), true);
+    $list = array_map(function ($product) { return $product['id']; }, $body);
+    $this->assertNotContains($product1->getId(), $list);
+    $this->assertContains($product2->getId(), $list);
+    $this->assertNotContains($product3->getId(), $list);
+  }
+
 }
