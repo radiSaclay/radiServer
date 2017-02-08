@@ -101,7 +101,7 @@ final class RouteApiEventTest extends ServerTestCase {
     $this->assertNotContains($event3->getId(), $list);
   }
 
-  public function testRouteGetEventsBySubrscibed () {
+  public function testRouteGetEventsBySubscribed () {
     $farm = faker\makeFarm(faker\makeUser());
     $event1 = faker\makeEvent($farm);
     $event2 = faker\makeEvent(faker\makeFarm(faker\makeUser()));
