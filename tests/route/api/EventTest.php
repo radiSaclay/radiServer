@@ -101,4 +101,58 @@ final class RouteApiEventTest extends ServerTestCase {
     $this->assertNotContains($event3->getId(), $list);
   }
 
+  public function testRouteGetEventsBySubrscibed () {
+    $farm = faker\makeFarm(faker\makeUser());
+    $event1 = faker\makeEvent($farm);
+    $event2 = faker\makeEvent(faker\makeFarm(faker\makeUser()));
+    $event3 = faker\makeEvent();
+
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $farm->addSubscriber($user);
+    $this->assertTrue($farm->hasSubscriber($user));
+
+    $res = makeRequest(
+      'GET', '/api/events/?subscribed=1', null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+
+    $body = json_decode($res->getBody(), true);
+    $list = array_map(function ($event) { return $event['id']; }, $body);
+    $this->assertContains($event1->getId(), $list);
+    $this->assertNotContains($event2->getId(), $list);
+    $this->assertNotContains($event3->getId(), $list);
+  }
+
+  public function testUpdatingProductsOfEvents () {
+    $product1 = faker\makeProduct();
+    $product2 = faker\makeProduct();
+    $product3 = faker\makeProduct();
+
+    $user = faker\makeUser();
+    $farm = faker\makeFarm($user);
+    $token = auth\createUserToken($user);
+    $event = faker\makeEvent($farm);
+
+    $event->addProduct($product1);
+    $event->addProduct($product2);
+    $this->assertTrue($event->hasProduct($product1));
+    $this->assertTrue($event->hasProduct($product2));
+    $this->assertFalse($event->hasProduct($product3));
+
+    $res = makeRequest(
+      'PUT', '/api/events/' . $event->getId(),
+      ['products' => [$product2->getid(), $product3->getid()]],
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+
+    $body = json_decode($res->getBody(), true);
+    $this->assertNotContains($product1->getId(), $body['products']);
+    $this->assertContains($product2->getId(), $body['products']);
+    $this->assertContains($product3->getId(), $body['products']);
+  }
+
 }
