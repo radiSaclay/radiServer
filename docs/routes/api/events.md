@@ -19,7 +19,9 @@ _Fields marked with ** are embedded fields_
 ##### GET /api/events/:id
 
 ##### GET /api/events/
-You can use filters such as `farmId` in argument of the query.
+You can use filters in argument of the query.
+The filter `farmId`can fileter event by farms.
+The filter `subscribed` for users can filter by suscribed products and farms.
 
 ##### POST /api/events/:id (for farmer only)
 ##### PUT /api/events/:id (for farmer owner only)
