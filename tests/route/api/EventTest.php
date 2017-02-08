@@ -101,7 +101,7 @@ final class RouteApiEventTest extends ServerTestCase {
     $this->assertNotContains($event3->getId(), $list);
   }
 
-  public function testRouteGetEventsBySubscribed () {
+  public function testRouteGetEventsBySubscribedFarms () {
     $farm = faker\makeFarm(faker\makeUser());
     $event1 = faker\makeEvent($farm);
     $event2 = faker\makeEvent(faker\makeFarm(faker\makeUser()));
@@ -123,6 +123,35 @@ final class RouteApiEventTest extends ServerTestCase {
     $list = array_map(function ($event) { return $event['id']; }, $body);
     $this->assertContains($event1->getId(), $list);
     $this->assertNotContains($event2->getId(), $list);
+    $this->assertNotContains($event3->getId(), $list);
+  }
+
+  public function testRouteGetEventsBySubscribedProducts () {
+    $product = faker\makeProduct();
+    $event1 = faker\makeEvent();
+    $event2 = faker\makeEvent();
+    $event3 = faker\makeEvent();
+
+    $event1->addProduct(faker\makeProduct())->save();
+    $event2->addProduct($product)->save();
+    $this->assertTrue($event2->hasProduct($product));
+
+    $user = faker\makeUser();
+    $token = auth\createUserToken($user);
+
+    $product->addSubscriber($user);
+    $this->assertTrue($product->hasSubscriber($user));
+
+    $res = makeRequest(
+      'GET', '/api/events/?subscribed=1', null,
+      ['HTTP_AUTHORIZATION' => $token]
+    );
+    $this->assertEquals($res->getStatusCode(), 200);
+
+    $body = json_decode($res->getBody(), true);
+    $list = array_map(function ($event) { return $event['id']; }, $body);
+    $this->assertNotContains($event1->getId(), $list);
+    $this->assertContains($event2->getId(), $list);
     $this->assertNotContains($event3->getId(), $list);
   }
 
