@@ -11,7 +11,6 @@
     <unique>
       <unique-column name="email"/>
     </unique>
-
     <behavior name="validate">
       <parameter name="emailNull" value="{ column: email, validator: NotNull }" />
       <parameter name="emailUnique" value="{ column: email, validator: Unique }" />

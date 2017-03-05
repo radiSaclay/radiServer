@@ -14,7 +14,27 @@ use Base\User as BaseUser;
  */
 class User extends BaseUser {
 
+  function valid_email($email) {
+    return !!filter_var($email, FILTER_VALIDATE_EMAIL);
+  }
+
+  function has_mail_n_pass(){
+    if( !$this->valid_email($this->getEmail()) && !is_null($this->getPassword()) ){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
   // > CRUD API
+  public function preInsert(\Propel\Runtime\Connection\ConnectionInterface $con = null)
+  {
+    if($this->has_mail_n_pass()){
+      return is_null($this->getFbId());
+    }else{
+      return !is_null($this->getFbId());
+    }
+  }
 
   public function serialize ($level = 1, $embedded_level = -1, $request = null) {
     $user = [];
