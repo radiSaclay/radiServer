@@ -25,7 +25,7 @@ $app->post('/auth/signup', function ($request, $response) {
 
 
 // ==================================================
-// > POST /api/auth/fb
+// > POST /auth/fb
 // Login or account creation using Facebook API
 // Expects a header with a facebook access token
 // Returns a jwt token which can be used to access the server api

@@ -26,14 +26,28 @@ class User extends BaseUser {
     }
   }
 
+  function has_no_email_or_pass(){
+    if ( is_null($this->getEmail()) && is_null($this->getPassword()) ){
+      return true;
+    }else {
+      return false;
+    }
+  }
+
   // > CRUD API
   public function preInsert(\Propel\Runtime\Connection\ConnectionInterface $con = null)
   {
-    if($this->has_mail_n_pass()){
-      return is_null($this->getFbId());
-    }else{
-      return !is_null($this->getFbId());
+    if(!$this->has_no_email_or_pass()){
+      if(!is_null($this->getFbId())){
+        throw new Exception("Has both (email or pass) and facebook id.");
+      }
     }
+    if ($this->has_no_email_or_pass()) {
+      if(is_null($this->getFbId())){
+        throw new Exception("Has neither (email and pass) nor facebook id.");
+      }
+    }
+    return true;
   }
 
   public function serialize ($level = 1, $embedded_level = -1, $request = null) {
