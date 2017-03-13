@@ -21,7 +21,7 @@
   <table name="farm" phpName="Farm">
     <behavior name="auto_add_pk"/>
     <column name="owner_id" type="integer" required="true"/>
-    <foreign-key foreignTable="user">
+    <foreign-key foreignTable="user" onDelete="CASCADE">>
       <reference local="owner_id" foreign="id"/>
     </foreign-key>
     <column name="name" type="varchar" required="true" primaryString="true"/>
@@ -54,7 +54,7 @@
   <table name="event" phpName="Event">
     <behavior name="auto_add_pk"/>
     <column name="farm_id" type="integer"/>
-    <foreign-key foreignTable="farm">
+    <foreign-key foreignTable="farm" onDelete="CASCADE">>
       <reference local="farm_id" foreign="id"/>
     </foreign-key>
     <column name="title" type="varchar" required="true" primaryString="true"/>
@@ -76,15 +76,15 @@
   <table name="order" phpName="Order">
     <behavior name="auto_add_pk"/>
     <column name="user_id" type="integer" required="true"/>
-    <foreign-key foreignTable="user">
+    <foreign-key foreignTable="user" onDelete="CASCADE">>
       <reference local="user_id" foreign="id"/>
     </foreign-key>
     <column name="farm_id" type="integer" required="true"/>
-    <foreign-key foreignTable="farm">
+    <foreign-key foreignTable="farm" onDelete="CASCADE">>
       <reference local="farm_id" foreign="id"/>
     </foreign-key>
     <column name="product_id" type="integer" required="true"/>
-    <foreign-key foreignTable="product">
+    <foreign-key foreignTable="product" onDelete="CASCADE">>
       <reference local="product_id" foreign="id"/>
     </foreign-key>
     <column name="quantity" type="decimal" required="true"/>
@@ -97,10 +97,10 @@
   <table name="event_product" isCrossRef="true">
     <column name="event_id" type="integer" primaryKey="true"/>
     <column name="product_id" type="integer" primaryKey="true"/>
-    <foreign-key foreignTable="event">
+    <foreign-key foreignTable="event" onDelete="CASCADE">>
       <reference local="event_id" foreign="id"/>
     </foreign-key>
-    <foreign-key foreignTable="product">
+    <foreign-key foreignTable="product" onDelete="CASCADE">>
       <reference local="product_id" foreign="id"/>
     </foreign-key>
   </table>
@@ -111,10 +111,10 @@
   <table name="farm_product" isCrossRef="true">
     <column name="farm_id" type="integer" primaryKey="true"/>
     <column name="product_id" type="integer" primaryKey="true"/>
-    <foreign-key foreignTable="product">
+    <foreign-key foreignTable="product" onDelete="CASCADE">>
       <reference local="product_id" foreign="id"/>
     </foreign-key>
-    <foreign-key foreignTable="farm">
+    <foreign-key foreignTable="farm" onDelete="CASCADE">>
       <reference local="farm_id" foreign="id"/>
     </foreign-key>
   </table>
@@ -124,10 +124,10 @@
   <table name="pin" isCrossRef="true">
     <column name="event_id" type="integer" primaryKey="true"/>
     <column name="user_id" type="integer" primaryKey="true"/>
-    <foreign-key foreignTable="user">
+    <foreign-key foreignTable="user" onDelete="CASCADE">
       <reference local="user_id" foreign="id"/>
     </foreign-key>
-    <foreign-key foreignTable="event">
+    <foreign-key foreignTable="event" onDelete="CASCADE">
       <reference local="event_id" foreign="id"/>
     </foreign-key>
   </table>
@@ -136,7 +136,7 @@
   <table name="subscription" phpName="Subscription">
     <behavior name="auto_add_pk"/>
     <column name="user_id" type="integer" primaryKey="true"/>
-    <foreign-key foreignTable="user">
+    <foreign-key foreignTable="user" onDelete="CASCADE">
       <reference local="user_id" foreign="id"/>
     </foreign-key>
     <column name="subscription_id" type="integer" primaryKey="true"/>
