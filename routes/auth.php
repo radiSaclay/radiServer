@@ -32,8 +32,8 @@ $app->post('/auth/signup', function ($request, $response) {
 // ==================================================
 $app->post('/auth/fb', function ($request, $response) {
   $fb = new Facebook\Facebook([
-    'app_id' => '763595500455557',
-    'app_secret' => 'ee5e5057f201e27c0a6d743c98dfb2ab',
+    'app_id' => '259526644492644',
+    'app_secret' => 'e1b06f3978feea4eab73dca305397b4a',
     'default_graph_version' => 'v2.8'
   ]);
   $fb->setDefaultAccessToken(\jwt\getAuthJWT($request));
