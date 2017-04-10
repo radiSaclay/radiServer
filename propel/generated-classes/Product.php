@@ -16,6 +16,7 @@ class Product extends BaseProduct {
 
   // > Subscriber
 
+  // Returns the number of users subscribed to this product
   public function countSubscribers () {
     return SubscriptionQuery::create()
       ->filterBySubscriptionId($this->getId())
@@ -23,6 +24,7 @@ class Product extends BaseProduct {
       ->count();
   }
 
+  // Returns true if the given user is subscribed to this product, false otherwise
   public function hasSubscriber ($user) {
     return SubscriptionQuery::create()
       ->filterByUserId($user->getId())
@@ -31,6 +33,7 @@ class Product extends BaseProduct {
       ->count() > 0;
   }
 
+  // Adds the given user as a subscriber to this product
   public function addSubscriber ($user) {
     if (!$this->hasSubscriber($user)) {
       $sub = new Subscription();
@@ -40,7 +43,7 @@ class Product extends BaseProduct {
       $sub->save();
     }
   }
-
+  // Re the given user as a subscriber to this product
   public function removeSubscriber ($user) {
     return SubscriptionQuery::create()
       ->filterByUserId($user->getId())
@@ -51,7 +54,9 @@ class Product extends BaseProduct {
 
   // > CRUD API
 
-  // Return Object as array
+  // From Object to JSON
+  // Level = level of detail of the object itself
+  // embedded_level = level of detail of the objects contained inside him
     public function serialize ($level = 1, $embedded_level = -1, $request = null) {
     $product = [];
     // Level 0
@@ -80,11 +85,13 @@ class Product extends BaseProduct {
     return $product;
   }
 
+  // JSON to Object
   public function unserialize ($data) {
     if (isset($data["name"])) $this->setName($data["name"]);
     if (isset($data["parentId"])) $this->changeParent($data["parentId"]);
   }
 
+  // Changes parent of a given product
   // I do this check manually because even though the DB will reject
   // Inserts having an invalid foreign key, it will send back a generic error
   // such as: Unable to execute INSERT statement [INSERT INTO product
