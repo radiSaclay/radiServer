@@ -1,5 +1,7 @@
 <?php
 
+// This is like the "main" file in C, C++ etc..
+
 // Load dependecies
 require_once __DIR__ . '/../vendor/autoload.php';
 require_once __DIR__ . '/../propel/generated-conf/config.php';
@@ -12,7 +14,7 @@ use Slim\App;
 // Create the Slim App
 $app = new App();
 
-// CORS
+// CORS Cross-origin resource sharing
 $app->add(function($request, $response, $next) {
   $response = $next($request, $response);
   return $response

@@ -14,10 +14,14 @@ use Base\Event as BaseEvent;
  */
 class Event extends BaseEvent {
 
+  // returns a boolean: true if the event has a given product, false otherwise
   public function hasProduct ($product) {
     return $this->getProducts()->contains($product);
   }
 
+  // From Object to JSON
+  // Level = level of detail of the object itself
+  // embedded_level = level of detail of the objects contained inside him
   public function serialize ($level = 1, $embedded_level = -1, $request = null) {
     $event = [];
     // Level 0
@@ -46,6 +50,7 @@ class Event extends BaseEvent {
     return $event;
   }
 
+  // From JSON to object
   public function unserialize ($data) {
     if (isset($data["title"])) $this->setTitle($data["title"]);
     if (isset($data["description"])) $this->setDescription($data["description"]);
@@ -55,6 +60,7 @@ class Event extends BaseEvent {
     if (isset($data["products"])) $this->resetProducts($data["products"]);
   }
 
+  // Removes all products from the event and adds the products with id corresponding to the array $productIds
   public function resetProducts ($productIds) {
     foreach ($this->getProducts() as $product) {
       $this->removeProduct($product);

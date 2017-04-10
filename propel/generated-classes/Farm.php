@@ -16,13 +16,14 @@ class Farm extends BaseFarm {
 
   // > Subscriber
 
+  // returns the number of subscribers of the farm
   public function countSubscribers () {
     return SubscriptionQuery::create()
       ->filterBySubscriptionId($this->getId())
       ->filterBySubscriptionType('farm')
       ->count();
   }
-
+  // returns a boolean, true if the farm has more than one subscriber, 0 otherwise
   public function hasSubscriber ($user) {
     return SubscriptionQuery::create()
       ->filterByUserId($user->getId())
@@ -31,6 +32,7 @@ class Farm extends BaseFarm {
       ->count() > 0;
   }
 
+  // adds the user (input) as subscriber to this farm
   public function addSubscriber ($user) {
     if (!$this->hasSubscriber($user)) {
       $sub = new Subscription();
@@ -41,6 +43,7 @@ class Farm extends BaseFarm {
     }
   }
 
+  // removes the given user as subscriber of this farm
   public function removeSubscriber ($user) {
     return SubscriptionQuery::create()
       ->filterByUserId($user->getId())
@@ -51,6 +54,9 @@ class Farm extends BaseFarm {
 
   // > CRUD API
 
+  // From Object to JSON
+  // Level = level of detail of the object itself
+  // embedded_level = level of detail of the objects contained inside him
   public function serialize ($level = 1, $embedded_level = -1, $request = null) {
     $farm = [];
     // Level 0
@@ -77,6 +83,7 @@ class Farm extends BaseFarm {
     return $farm;
   }
 
+  // JSON to Object
   public function unserialize ($data) {
     if (isset($data["name"])) $this->setName($data["name"]);
     if (isset($data["address"])) $this->setAddress($data["address"]);

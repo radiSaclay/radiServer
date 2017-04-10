@@ -5,8 +5,8 @@
     "firebase/php-jwt": "^4.0",
     "vlucas/phpdotenv": "^2.4",
     "fzaninotto/faker": "^1.6",
-    "guzzlehttp/guzzle": "^6.2",
-    "phpunit/phpunit": "^5.7"
+    "phpunit/phpunit": "^5.7",
+    "facebook/graph-sdk": "^5.4"
   },
   "autoload": {
     "classmap": ["propel/generated-classes/"]

@@ -14,6 +14,7 @@ use Base\FarmQuery as BaseFarmQuery;
  */
 class FarmQuery extends BaseFarmQuery {
 
+  // Returns all farm to which the $user is subscribed
   public function filterBySubscriber ($user) {
     $list = SubscriptionQuery::create()
       ->select('subscription_id')

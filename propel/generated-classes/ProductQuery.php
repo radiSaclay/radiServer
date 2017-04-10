@@ -14,6 +14,7 @@ use Base\ProductQuery as BaseProductQuery;
  */
 class ProductQuery extends BaseProductQuery {
 
+  // Returns all products to which the $user is subscribed
   public function filterBySubscriber ($user) {
     $list = SubscriptionQuery::create()
       ->select('subscription_id')
